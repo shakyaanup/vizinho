@@ -161,6 +161,14 @@ Incidents don't change this state machine. An open incident is a flag (`has_open
 
 ## 7. Database schema (initial)
 
+> **Implemented in Phase 1, Step 3** (`supabase/migrations/`). Where the code and this section differ, the migrations are the source of truth. Deviations from the original draft:
+>
+> - Host vetting is admin approval only: `verification_method/verified_by/verified_at` became `review_note/reviewed_by/reviewed_at`.
+> - No `public_hosts` view: approved rows are readable through RLS, and `public_location` is maintained by a trigger from `host_private_details` (clients can't write it). A view would be a second source of truth.
+> - Hosts can't read customer `profiles` rows (they would expose phone numbers). The customer's display name will reach hosts through a reservation RPC.
+> - Added the `actor_role` enum (`customer|host|admin|system`), `pickup_tokens.revoked_at`, `reservations.cancel_reason`, and `ledger_entries` sign checks.
+> - `notifications` has no email columns (in-app + Realtime only).
+
 All PKs are `uuid` (`gen_random_uuid()`), except `bigint identity` on append-only logs. All tables have `created_at`, and mutable tables also have `updated_at` (trigger-maintained). RLS is **enabled on every table**. Money is stored as `integer` cents, in EUR. Timestamps are `timestamptz`, and hours are interpreted in `Europe/Lisbon`.
 
 ### Enums

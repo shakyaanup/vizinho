@@ -1,0 +1,1 @@
+-- Local development seed data (MOCK ONLY). Demo users and hosts are added in Phase 1, Step 4.

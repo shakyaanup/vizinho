@@ -4,4 +4,3 @@ coverage
 pnpm-lock.yaml
 next-env.d.ts
 supabase/.temp
-src/types/database.ts

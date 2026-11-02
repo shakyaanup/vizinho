@@ -23,7 +23,7 @@ Architecture approved. **Next: Phase 1 (Foundation).** Implement one phase at a 
 
 1. **No carrier/merchant integrations.** Never invent APIs or tracking for Amazon, CTT, DHL, DPD, etc. Parcel status comes only from host, customer, or admin actions. Never claim in UI copy that a merchant or carrier will accept a host address.
 2. **Use mock data** (`supabase/seed.sql`) until the legal and delivery assumptions are validated.
-3. **The service-role key never reaches the client.** It's only used in `src/lib/supabase/admin.ts` (imports `server-only`), and only for admin/job code.
+3. **The secret key (`SUPABASE_SECRET_KEY`, bypasses RLS) never reaches the client.** It's only used in `src/lib/supabase/admin.ts` (imports `server-only`), and only for admin/job code.
 4. **RLS on every table**, with no exceptions. A new table without policies + pgTAP tests is incomplete.
 5. **State transitions go through Postgres RPC functions** (`SECURITY DEFINER`, `set search_path = ''`, check `auth.uid()`, role, and current state). Clients have no direct UPDATE on `reservations`, `parcels`, or `pickup_tokens`. Each transition writes exactly one `custody_events` row in the same transaction.
 6. **`custody_events`, `audit_logs`, and `ledger_entries` are append-only.** Fix mistakes with new rows, never with an UPDATE/DELETE.
@@ -51,7 +51,18 @@ pnpm format              # Prettier write
 pnpm test | test:watch   # Vitest
 ```
 
-Playwright + Chromium are installed (e2e suite added in Step 6). Added in later steps: `pnpm test:e2e`, `supabase start | db reset | test db`, `pnpm db:types`.
+Database (Docker must be running):
+
+```
+pnpm db:start | db:stop  # local Supabase (Studio http://127.0.0.1:54323, Mailpit http://127.0.0.1:54324)
+pnpm db:status           # URLs and local keys (copy into .env.local)
+pnpm db:reset            # rebuild from migrations + seed.sql
+pnpm db:test             # pgTAP tests in supabase/tests/database
+pnpm db:lint             # plpgsql_check on public + private schemas
+pnpm db:types            # regenerate src/types/database.ts (after every migration)
+```
+
+Playwright + Chromium are installed (e2e suite added in Step 6).
 
 ## Next.js 16.4 specifics (differs from older versions)
 
@@ -59,6 +70,14 @@ Playwright + Chromium are installed (e2e suite added in Step 6). Added in later 
 - **`middleware.ts` is now `src/proxy.ts`** (export `proxy`, Node runtime). Use it only for session refresh and optimistic redirects, never as the real authorization check.
 - **`cacheComponents` is on:** reading `cookies()`/the session must happen inside a `<Suspense>` boundary, not as a top-level `await` in a layout. Request APIs (`cookies`, `headers`, `params`) are async.
 - `next lint` no longer exists. Use `pnpm lint`.
+
+## Database conventions
+
+- **Deny by default:** the foundation migration removes Supabase's automatic grants. Every new table needs explicit `grant`s (column-level for writable columns) **and** RLS policies. Every new function is non-executable until granted.
+- Helpers used by policies/RPCs live in the `private` schema (not exposed by the API). `SECURITY DEFINER` functions always `set search_path = ''` and fully qualify names (`public.x`, `extensions.st_*`).
+- Wrap `auth.uid()`/helpers in policies as `(select …)` so Postgres evaluates them once per query, not per row.
+- `01_security_baseline.test.sql` is the guard test (RLS on every table, no anon grants, no client writes on state tables, pinned search paths). Update its table list when adding a table.
+- pgTAP helpers: `supabase/tests/database/_helpers.psql` (`tests.create_user`, `tests.authenticate_as`, `tests.create_approved_host`, …). Switch back with `reset role;`.
 
 ## Conventions
 
