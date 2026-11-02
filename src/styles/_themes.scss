@@ -1,0 +1,85 @@
+// Semantic color roles as CSS custom properties.
+// Components use these (e.g. `var(--color-text)`), never the raw palette, so a
+// single attribute switch re-themes the whole app at runtime.
+// Theme resolution:
+//   1. <html data-theme="light|dark"> wins when set (user choice, Step 5).
+//   2. Otherwise the OS setting (prefers-color-scheme) decides.
+@use "tokens" as *;
+
+@mixin light-theme {
+  color-scheme: light;
+
+  --color-bg: #{$stone-50};
+  --color-surface: #{$stone-0};
+  --color-surface-raised: #{$stone-0};
+  --color-surface-sunken: #{$stone-100};
+  --color-border: #{$stone-200};
+  --color-border-strong: #{$stone-400};
+  --color-text: #{$stone-900};
+  --color-text-muted: #{$stone-600};
+  --color-text-inverse: #{$stone-0};
+  --color-primary: #{$teal-700};
+  --color-primary-hover: #{$teal-800};
+  --color-primary-subtle: #{$teal-50};
+  --color-on-primary: #{$stone-0};
+  --color-accent: #{$terracotta-700};
+  --color-accent-subtle: #{$terracotta-100};
+  --color-danger: #{$red-700};
+  --color-danger-subtle: #{$red-100};
+  --color-success: #{$green-700};
+  --color-success-subtle: #{$green-100};
+  --color-warning: #{$amber-800};
+  --color-warning-subtle: #{$amber-100};
+  --color-focus-ring: #{$teal-600};
+  --color-overlay: rgb(12 10 9 / 50%);
+  --shadow-sm: 0 1px 2px rgb(28 25 23 / 6%);
+  --shadow-md: 0 4px 12px rgb(28 25 23 / 8%), 0 1px 3px rgb(28 25 23 / 6%);
+  --shadow-lg: 0 16px 40px rgb(28 25 23 / 14%), 0 2px 6px rgb(28 25 23 / 6%);
+}
+
+@mixin dark-theme {
+  color-scheme: dark;
+
+  --color-bg: #{$stone-950};
+  --color-surface: #{$stone-900};
+  --color-surface-raised: #{$stone-850};
+  --color-surface-sunken: #{$stone-950};
+  --color-border: #{$stone-800};
+  --color-border-strong: #{$stone-600};
+  --color-text: #{$stone-100};
+  --color-text-muted: #{$stone-400};
+  --color-text-inverse: #{$stone-900};
+  --color-primary: #{$teal-400};
+  --color-primary-hover: #{$teal-300};
+  --color-primary-subtle: #{$teal-950};
+  --color-on-primary: #{$teal-950};
+  --color-accent: #{$terracotta-400};
+  --color-accent-subtle: #{$amber-950};
+  --color-danger: #{$red-400};
+  --color-danger-subtle: #{$red-950};
+  --color-success: #{$green-400};
+  --color-success-subtle: #{$green-950};
+  --color-warning: #{$amber-400};
+  --color-warning-subtle: #{$amber-950};
+  --color-focus-ring: #{$teal-300};
+  --color-overlay: rgb(0 0 0 / 65%);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 55%);
+}
+
+@mixin theme-variables {
+  :root {
+    @include light-theme;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      @include dark-theme;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    @include dark-theme;
+  }
+}

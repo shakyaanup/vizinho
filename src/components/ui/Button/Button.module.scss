@@ -1,0 +1,101 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.button {
+  display: inline-flex;
+  gap: $space-2;
+  align-items: center;
+  justify-content: center;
+  min-width: $touch-target;
+  padding: 0 $space-5;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  border: $border-width solid transparent;
+  border-radius: $radius-md;
+  transition:
+    background-color $duration-fast $ease-out,
+    border-color $duration-fast $ease-out,
+    color $duration-fast $ease-out,
+    transform $duration-fast $ease-out;
+
+  @include focus-ring;
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  &[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+// ---------- Sizes ----------
+.md {
+  min-height: $control-height-md;
+  font-size: $font-size-base;
+}
+
+.lg {
+  min-height: $control-height-lg;
+  padding: 0 $space-6;
+  font-size: $font-size-lg;
+  border-radius: $radius-lg;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+// ---------- Variants ----------
+.primary {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+  }
+}
+
+.secondary {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-sunken);
+  }
+}
+
+.ghost {
+  color: var(--color-text);
+  background: transparent;
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-sunken);
+  }
+}
+
+.danger {
+  color: var(--color-text-inverse);
+  background: var(--color-danger);
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.92);
+  }
+}

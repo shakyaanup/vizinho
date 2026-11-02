@@ -1,0 +1,45 @@
+// Reusable style patterns. Import with `@use "styles/mixins" as *;`.
+@use "tokens" as *;
+
+// Mobile-first media query: styles apply from this breakpoint upward.
+//   @include respond-to("md") { ... }
+@mixin respond-to($name) {
+  @media (min-width: breakpoint($name)) {
+    @content;
+  }
+}
+
+// Visible keyboard focus. Shown only for keyboard users (:focus-visible),
+// never removed outright (WCAG 2.4.7 / 2.4.11).
+@mixin focus-ring($offset: 2px) {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: $offset;
+  }
+}
+
+// Hidden visually but still read by screen readers.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
+
+// Ensure an interactive element meets the 44px minimum target size.
+@mixin touch-target {
+  min-width: $touch-target;
+  min-height: $touch-target;
+}
+
+// Respect users who ask the OS to minimise animation.
+@mixin motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}

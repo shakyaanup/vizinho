@@ -51,7 +51,7 @@ pnpm format              # Prettier write
 pnpm test | test:watch   # Vitest
 ```
 
-Added in later steps: `pnpm test:e2e` (Playwright), `supabase start | db reset | test db`, `pnpm db:types`.
+Playwright + Chromium are installed (e2e suite added in Step 6). Added in later steps: `pnpm test:e2e`, `supabase start | db reset | test db`, `pnpm db:types`.
 
 ## Next.js 16.4 specifics (differs from older versions)
 
@@ -61,6 +61,8 @@ Added in later steps: `pnpm test:e2e` (Playwright), `supabase start | db reset |
 - `next lint` no longer exists. Use `pnpm lint`.
 
 ## Conventions
+
+- **UI kit:** `src/components/ui/` has Button, Spinner, Field, Input, Card, Dialog, Toast. Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
 
 - **Layout:** routes in `src/app/{customer,host,admin}`. Domain logic in `src/features/<domain>/{actions,queries,schemas}.ts`. Shared UI in `src/components`.
 - **Server first:** default to Server Components. Add `"use client"` only for interactivity. Mutations are Server Actions that zod-validate input and then call an RPC.

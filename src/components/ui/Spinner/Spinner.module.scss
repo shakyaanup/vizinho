@@ -1,0 +1,32 @@
+@use "styles/tokens" as *;
+
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: $radius-full;
+  animation: spin 700ms linear infinite;
+}
+
+.sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.md {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

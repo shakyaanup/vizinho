@@ -1,0 +1,39 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.card {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-lg;
+}
+
+.elevated {
+  background: var(--color-surface-raised);
+  border-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+
+.paddingNone {
+  padding: 0;
+}
+
+.paddingSm {
+  padding: $space-3;
+}
+
+.paddingMd {
+  padding: $space-4;
+
+  @include respond-to("md") {
+    padding: $space-6;
+  }
+}
+
+.paddingLg {
+  padding: $space-6;
+
+  @include respond-to("md") {
+    padding: $space-8;
+  }
+}

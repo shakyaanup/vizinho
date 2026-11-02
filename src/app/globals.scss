@@ -1,4 +1,6 @@
 @use "styles/tokens" as *;
+@use "styles/themes";
+@include themes.theme-variables;
 
 *,
 *::before,
@@ -12,10 +14,60 @@ html {
 }
 
 body {
+  min-height: 100dvh;
   margin: 0;
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: $font-sans;
   font-size: $font-size-base;
-  line-height: 1.5;
-  color: $color-neutral-900;
-  background: $color-neutral-50;
+  line-height: $line-height-normal;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: $line-height-tight;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-primary);
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

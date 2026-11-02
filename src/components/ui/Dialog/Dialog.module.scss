@@ -1,0 +1,133 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-overlay;
+  background: var(--color-overlay);
+
+  @include motion-safe {
+    &[data-state="open"] {
+      animation: fade-in $duration-base $ease-out;
+    }
+  }
+}
+
+.content {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: $z-modal;
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+  padding: $space-5 $space-4 calc($space-5 + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+  border-radius: $radius-xl $radius-xl 0 0;
+  box-shadow: var(--shadow-lg);
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  @include motion-safe {
+    &[data-state="open"] {
+      animation: slide-up $duration-slow $ease-out;
+    }
+  }
+
+  @include respond-to("sm") {
+    inset: 50% auto auto 50%;
+    width: min(32rem, calc(100vw - #{$space-8}));
+    max-height: 85dvh;
+    padding: $space-6;
+    border-radius: $radius-xl;
+    transform: translate(-50%, -50%);
+
+    @include motion-safe {
+      &[data-state="open"] {
+        animation: scale-in $duration-base $ease-out;
+      }
+    }
+  }
+}
+
+.header {
+  display: flex;
+  gap: $space-4;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+}
+
+.close {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  margin: (-$space-2) (-$space-2) 0 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: $radius-full;
+
+  @include touch-target;
+  @include focus-ring;
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.description {
+  margin: $space-2 0 0;
+  color: var(--color-text-muted);
+}
+
+.body {
+  margin-top: $space-4;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: $space-3;
+  margin-top: $space-6;
+
+  @include respond-to("sm") {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}

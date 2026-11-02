@@ -1,0 +1,48 @@
+@use "styles/tokens" as *;
+
+.field {
+  display: grid;
+  gap: $space-2;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+}
+
+.required {
+  font-weight: $font-weight-regular;
+  color: var(--color-text-muted);
+}
+
+.hint {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}
+
+.error {
+  display: flex;
+  gap: $space-1;
+  align-items: center;
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-danger);
+
+  // A visual marker so the error is not conveyed by color alone (WCAG 1.4.1).
+  &::before {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 1.1em;
+    height: 1.1em;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: var(--color-text-inverse);
+    content: "!";
+    background: var(--color-danger);
+    border-radius: $radius-full;
+  }
+}
