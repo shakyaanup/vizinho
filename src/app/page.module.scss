@@ -1,0 +1,16 @@
+@use "styles/tokens" as *;
+
+.main {
+  display: grid;
+  gap: $space-2;
+  place-content: center;
+  min-height: 100dvh;
+  padding: $space-6 $space-4;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-xl;
+  color: $color-brand-600;
+}

@@ -1,0 +1,21 @@
+@use "styles/tokens" as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $color-neutral-900;
+  background: $color-neutral-50;
+}

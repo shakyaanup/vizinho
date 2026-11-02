@@ -1,0 +1,23 @@
+{
+  "extends": ["stylelint-config-standard-scss", "stylelint-config-recess-order"],
+  "rules": {
+    "selector-class-pattern": [
+      "^[a-z][a-zA-Z0-9]*$",
+      { "message": "Use camelCase class names so CSS Modules map to styles.myClass" }
+    ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["global", "export"] }
+    ],
+    "property-no-unknown": [true, { "ignoreSelectors": [":export"] }],
+    "property-no-vendor-prefix": [true, { "ignoreProperties": ["/text-size-adjust/"] }],
+    "scss/dollar-variable-empty-line-before": null,
+    "color-no-hex": true
+  },
+  "overrides": [
+    {
+      "files": ["src/styles/_tokens.scss", "src/styles/_themes.scss"],
+      "rules": { "color-no-hex": null }
+    }
+  ]
+}
