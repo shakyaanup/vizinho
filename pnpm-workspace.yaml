@@ -3,3 +3,4 @@ allowBuilds:
   unrs-resolver: false
   "@parcel/watcher": false
   supabase: true
+  "@swc/core": false

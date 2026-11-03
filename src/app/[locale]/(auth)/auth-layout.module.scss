@@ -1,0 +1,58 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-3 $space-4;
+}
+
+.logo {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: $space-4 $space-4 $space-12;
+
+  @include respond-to("sm") {
+    align-items: flex-start;
+    padding-top: $space-12;
+  }
+}
+
+// Full-bleed on phones; a card on larger screens.
+.card {
+  width: 100%;
+  max-width: 26rem;
+
+  @include respond-to("sm") {
+    padding: $space-8;
+    background: var(--color-surface);
+    border: $border-width solid var(--color-border);
+    border-radius: $radius-xl;
+    box-shadow: var(--shadow-sm);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: $font-size-2xl;
+  }
+}
+
+.subtitle {
+  margin: $space-2 0 $space-6;
+  color: var(--color-text-muted);
+}

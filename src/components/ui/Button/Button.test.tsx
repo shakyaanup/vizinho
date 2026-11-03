@@ -29,12 +29,12 @@ describe("Button", () => {
   it("renders its child element with button styles when asChild is set", () => {
     render(
       <Button asChild variant="secondary">
-        <a href="/login">Log in</a>
+        <a href="https://example.com/guide">Read the guide</a>
       </Button>,
     );
-    const link = screen.getByRole("link", { name: "Log in" });
+    const link = screen.getByRole("link", { name: "Read the guide" });
 
-    expect(link).toHaveAttribute("href", "/login");
+    expect(link).toHaveAttribute("href", "https://example.com/guide");
     expect(link).toHaveClass("button", "secondary");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });

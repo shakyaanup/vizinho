@@ -89,20 +89,22 @@ select is_empty($$ select id from public.custody_events $$,
 reset role;
 
 select tests.authenticate_as(:'adam');
-select results_eq($$ select count(*)::int from public.reservations $$, $$ values (1) $$,
-  'admins see all reservations');
+select results_eq(format($$ select count(*)::int from public.reservations where id = %L $$, :'res'),
+  $$ values (1) $$,
+  'admins see reservations they are not party to');
 reset role;
 
 -- --- Booked hosts stay visible after suspension -------------------------------------
 update public.host_profiles set status = 'suspended' where id = :'host';
 
 select tests.authenticate_as(:'carl');
-select results_eq($$ select count(*)::int from public.host_profiles $$, $$ values (1) $$,
+select results_eq(format($$ select count(*)::int from public.host_profiles where id = %L $$, :'host'),
+  $$ values (1) $$,
   'a customer still sees a suspended host they booked');
 reset role;
 
 select tests.authenticate_as(:'dora');
-select is_empty($$ select id from public.host_profiles $$,
+select is_empty(format($$ select id from public.host_profiles where id = %L $$, :'host'),
   'suspended hosts are hidden from everyone else');
 reset role;
 

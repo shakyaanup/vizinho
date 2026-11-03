@@ -7,9 +7,21 @@ A Portugal-first, peer-to-peer parcel pickup platform: customers have parcels de
 - Product brief: [`docs/VIZINHO_PROJECT_BRIEF.md`](docs/VIZINHO_PROJECT_BRIEF.md)
 - Architecture, schema and roadmap: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)
 
+## Try it
+
+Open the app and press **Try as customer / host / admin** on the home page, or log in with one of the seeded demo accounts (password `VizinhoDemo2026`):
+
+| Role     | Email                       |
+| -------- | --------------------------- |
+| Customer | `customer@demo.vizinho.app` |
+| Host     | `host@demo.vizinho.app`     |
+| Admin    | `admin@demo.vizinho.app`    |
+
+The app is available in English (`/`) and European Portuguese (`/pt`).
+
 ## Tech stack
 
-Next.js 16 (App Router) · TypeScript · SCSS Modules · Supabase (Postgres, Auth, RLS) · Vitest
+Next.js 16 (App Router, Cache Components) · TypeScript · SCSS Modules · Radix UI · next-intl · Supabase (Postgres, Auth, RLS) · zod · Vitest · pgTAP · Playwright
 
 ## Local setup
 

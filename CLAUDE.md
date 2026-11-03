@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-Architecture approved. **Next: Phase 1 (Foundation).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+Phase 1 in progress: Steps 1–4 done (scaffold, design system, database, auth). **Next: Step 5, role-based app shells.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -70,6 +70,18 @@ Playwright + Chromium are installed (e2e suite added in Step 6).
 - **`middleware.ts` is now `src/proxy.ts`** (export `proxy`, Node runtime). Use it only for session refresh and optimistic redirects, never as the real authorization check.
 - **`cacheComponents` is on:** reading `cookies()`/the session must happen inside a `<Suspense>` boundary, not as a top-level `await` in a layout. Request APIs (`cookies`, `headers`, `params`) are async.
 - `next lint` no longer exists. Use `pnpm lint`.
+- Code that checks the session must `await connection()` first (done in `getCurrentUser`), or prefetching flags `Date.now()` as non-deterministic.
+- Don't read `?query` params with `useSearchParams()` in forms on static pages, because React then skips server-rendering them. Read `searchParams` in the page (inside `<Suspense>`) and pass props down.
+
+## Auth & i18n patterns
+
+- **Who is the user:** `getCurrentUser()` / `requireUser(returnTo)` / `requireRole(role, returnTo)` from `@/lib/auth/session` (uses `getClaims()`, never `getSession()`). Call them inside a `<Suspense>` boundary.
+- **Supabase clients:** `@/lib/supabase/server` (per request, RLS applies), `@/lib/supabase/browser` (client components), `@/lib/supabase/admin` (secret key, bypasses RLS, trusted jobs only).
+- **Proxy (`src/proxy.ts`):** refreshes the session, then runs next-intl routing, then copies cookies and no-cache headers. Signed-out visitors on `PROTECTED_PREFIXES` get an optimistic redirect to `/login?next=`. Add new protected areas there **and** guard the page.
+- **Locale:** URL segment `[locale]` (`/` = en, `/pt` = pt-PT; ADR 0002). Always use `Link`/`redirect`/`getPathname` from `@/i18n/navigation`. Server Actions get the locale from a hidden `locale` field and return translation keys (`FormState`), never raw error text.
+- **Redirect targets** from user input go through `safeRedirectPath()` (open-redirect guard).
+- **Demo accounts** (seeded, password `VizinhoDemo2026`): `customer@`, `host@`, `admin@demo.vizinho.app`.
+- Auth emails use `supabase/templates/*.html` (bilingual, `token_hash` links to `/[locale]/auth/confirm`). Locally they land in Mailpit.
 
 ## Database conventions
 
@@ -88,7 +100,7 @@ Playwright + Chromium are installed (e2e suite added in Step 6).
 - **Migrations:** new timestamped file per change via `supabase migration new`. Never edit a merged migration. Regenerate types after every schema change.
 - **Money:** integer cents, EUR. **Time:** `timestamptz`, displayed in `Europe/Lisbon`.
 - **Styling:** never Tailwind. Each component is a folder: `Component.tsx` + `Component.module.scss` + `index.ts`. Use tokens from `src/styles/` (`@use "styles/tokens" as *;`, resolved via `sassOptions.loadPaths`), not raw hex/px values. Stylelint forbids hex colors outside the token/theme files. Class names are camelCase. Theme colors are CSS custom properties so light/dark switching works. Write mobile-first media queries via the `respond-to()` mixin.
-- **i18n:** no hard-coded user-facing strings. Add keys to both `messages/en.json` and `messages/pt-PT.json`.
+- **i18n:** no hard-coded user-facing strings. Add keys to both `src/messages/en.json` and `src/messages/pt-PT.json` (European Portuguese). A unit test fails if the key sets or `{placeholders}` differ.
 - **Accessibility:** WCAG 2.2 AA, semantic HTML, labelled inputs, visible focus, 44px touch targets, no color-only status. Mobile-first: design at 360px width first.
 - **Errors:** server actions return typed `{ ok: true, data } | { ok: false, error }` results. Never leak DB errors or PII to the client.
 - **Naming:** `snake_case` in SQL, `camelCase` in TS. Component folders/files use `PascalCase` (`Button/Button.tsx`), and all other files use `kebab-case`.

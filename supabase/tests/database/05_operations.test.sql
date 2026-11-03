@@ -84,8 +84,9 @@ select throws_ok(
   'payouts must be negative amounts');
 
 select tests.authenticate_as(:'adam');
-select results_eq($$ select count(*)::int from public.incidents $$, $$ values (1) $$,
-  'admins see every incident');
+select results_eq(format($$ select count(*)::int from public.incidents where reservation_id = %L $$, :'res'),
+  $$ values (1) $$,
+  'admins see incidents they are not involved in');
 reset role;
 
 select * from finish();

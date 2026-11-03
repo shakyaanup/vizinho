@@ -1,0 +1,115 @@
+{
+  "Metadata": {
+    "description": "Receive your parcels at a trusted neighbor or local shop in Portugal."
+  },
+  "Common": {
+    "appName": "Vizinho",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "notifications": "Notifications",
+    "required": "(required)",
+    "skipToContent": "Skip to content",
+    "language": "Language",
+    "loading": "Loading…",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "Home": {
+    "eyebrow": "Parcel pickup, neighbor to neighbor",
+    "title": "Never miss a delivery again",
+    "lead": "Have parcels delivered to a verified neighbor or local shop near you, then collect them when it suits you with a one-time pickup code.",
+    "createAccount": "Create an account",
+    "logIn": "Log in",
+    "steps": {
+      "title": "How it works",
+      "find": "Find a host near you on the map",
+      "reserve": "Reserve and use their address at checkout",
+      "collect": "Collect with your one-time code"
+    },
+    "demo": {
+      "title": "Explore the demo",
+      "body": "This is a portfolio project with mock data. Jump straight in with a ready-made account:",
+      "customer": "Try as customer",
+      "customerHint": "Find hosts and reserve a pickup",
+      "host": "Try as host",
+      "hostHint": "Accept parcels and hand them over",
+      "admin": "Try as admin",
+      "adminHint": "Approve hosts and audit custody"
+    },
+    "disclaimer": "Vizinho has no integration with merchants or carriers. Whether a delivery can be made to a host's address depends on each merchant and carrier."
+  },
+  "Auth": {
+    "email": "Email",
+    "password": "Password",
+    "login": {
+      "title": "Log in",
+      "subtitle": "Welcome back to Vizinho.",
+      "submit": "Log in",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "New to Vizinho?",
+      "signUpLink": "Create an account"
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "It's free while Vizinho is in its pilot.",
+      "fullName": "Full name",
+      "passwordHint": "At least 8 characters, with letters and numbers.",
+      "acceptTerms": "I accept the Terms of Service and Privacy Policy",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "logInLink": "Log in",
+      "successTitle": "Check your email",
+      "successBody": "If {email} can be registered, we've sent a confirmation link to it. Open it to activate your account.",
+      "localMailHint": "Running locally? Emails arrive in Mailpit at http://127.0.0.1:54324."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link.",
+      "submit": "Send reset link",
+      "successTitle": "Check your email",
+      "successBody": "If an account exists for {email}, a reset link is on its way. It expires in 1 hour.",
+      "backToLogin": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "newPassword": "New password",
+      "submit": "Save password"
+    },
+    "signOut": "Log out",
+    "errors": {
+      "invalidCredentials": "Email or password is incorrect.",
+      "emailNotConfirmed": "Please confirm your email first. Check your inbox for the link.",
+      "rateLimited": "Too many attempts. Please wait a moment and try again.",
+      "linkInvalid": "That link is invalid or has expired. Please request a new one.",
+      "unexpected": "Something went wrong. Please try again.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Enter your password.",
+      "passwordTooShort": "Use at least 8 characters.",
+      "passwordWeak": "Use both letters and numbers.",
+      "passwordTooLong": "Use at most 72 characters.",
+      "passwordSame": "Choose a password different from your current one.",
+      "nameRequired": "Enter your name (2–100 characters).",
+      "termsRequired": "You need to accept the terms to continue.",
+      "demoUnavailable": "The demo account is unavailable right now. Please try again later."
+    }
+  },
+  "Account": {
+    "title": "Your account",
+    "welcome": "Welcome, {name}",
+    "confirmed": "Your email is confirmed. Welcome to Vizinho!",
+    "passwordUpdated": "Your password has been updated.",
+    "email": "Email",
+    "roles": "Roles",
+    "roleNames": {
+      "customer": "Customer",
+      "host": "Host",
+      "admin": "Admin"
+    },
+    "comingSoon": "Your customer, host and admin dashboards arrive in the next step."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "home": "Go to the home page"
+  }
+}

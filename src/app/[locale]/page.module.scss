@@ -1,0 +1,146 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: $container-max;
+  padding: $space-3 $space-4;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: var(--color-primary);
+}
+
+.nav {
+  display: flex;
+  gap: $space-2;
+  align-items: center;
+}
+
+.main {
+  display: grid;
+  gap: $space-12;
+  max-width: $container-max;
+  padding: $space-6 $space-4 $space-16;
+  margin: 0 auto;
+
+  @include respond-to("lg") {
+    grid-template-columns: 1.2fr 1fr;
+    column-gap: $space-16;
+    align-items: start;
+    padding-top: $space-16;
+  }
+
+  h2 {
+    margin: 0 0 $space-4;
+    font-size: $font-size-xl;
+  }
+}
+
+.hero {
+  display: grid;
+  gap: $space-4;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-4xl;
+
+  @include respond-to("md") {
+    font-size: 3.25rem;
+  }
+}
+
+.lead {
+  max-width: 36rem;
+  margin: 0;
+  font-size: $font-size-lg;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: grid;
+  gap: $space-3;
+  margin-top: $space-2;
+
+  @include respond-to("sm") {
+    display: flex;
+  }
+}
+
+.section {
+  @include respond-to("lg") {
+    grid-column: 1;
+  }
+}
+
+.steps {
+  display: grid;
+  gap: $space-3;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: $space-3;
+  align-items: center;
+}
+
+.stepIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  border-radius: $radius-md;
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.stepNumber {
+  font-weight: $font-weight-bold;
+  color: var(--color-text-muted);
+}
+
+.demo {
+  @include respond-to("lg") {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}
+
+.muted {
+  margin: 0 0 $space-4;
+  color: var(--color-text-muted);
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+
+  @include respond-to("lg") {
+    grid-column: 1 / -1;
+  }
+}

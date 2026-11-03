@@ -74,7 +74,8 @@ select ok(
 
 -- --- Before approval, nobody else sees the application ------------------------------
 select tests.authenticate_as(:'carl');
-select is_empty($$ select id from public.host_profiles $$, 'draft hosts are not listed to customers');
+select is_empty(format($$ select id from public.host_profiles where user_id = %L $$, :'hana'),
+  'draft hosts are not listed to customers');
 reset role;
 
 -- Admin approves (the approval RPC arrives in Phase 2).
@@ -89,7 +90,7 @@ insert into public.host_time_off (host_id, starts_at, ends_at, reason)
 select tests.authenticate_as(:'carl');
 
 select results_eq(
-  $$ select display_name from public.host_profiles $$,
+  format($$ select display_name from public.host_profiles where user_id = %L $$, :'hana'),
   $$ values ('Hana''s Corner'::text) $$,
   'approved hosts are listed to customers'
 );
@@ -97,7 +98,10 @@ select results_eq(
 select is_empty($$ select host_id from public.host_private_details $$,
   'customers can never read a host''s private address');
 
-select results_eq($$ select count(*)::int from public.host_weekly_hours $$, $$ values (1) $$,
+select results_eq(
+  format($$ select count(*)::int from public.host_weekly_hours h
+            join public.host_profiles p on p.id = h.host_id where p.user_id = %L $$, :'hana'),
+  $$ values (1) $$,
   'customers can see an approved host''s opening hours');
 
 select is_empty($$ select id from public.host_time_off $$,
@@ -113,9 +117,15 @@ select throws_ok(
 reset role;
 
 select tests.authenticate_as(:'adam');
-select results_eq($$ select count(*)::int from public.host_private_details $$, $$ values (1) $$,
+select results_eq(
+  format($$ select count(*)::int from public.host_private_details d
+            join public.host_profiles p on p.id = d.host_id where p.user_id = %L $$, :'hana'),
+  $$ values (1) $$,
   'admins can read private host details');
-select results_eq($$ select count(*)::int from public.host_time_off $$, $$ values (1) $$,
+select results_eq(
+  format($$ select count(*)::int from public.host_time_off t
+            join public.host_profiles p on p.id = t.host_id where p.user_id = %L $$, :'hana'),
+  $$ values (1) $$,
   'admins can read host time off');
 reset role;
 

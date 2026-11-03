@@ -2,15 +2,26 @@
 
 .main {
   display: grid;
-  gap: $space-2;
+  gap: $space-3;
   place-content: center;
+  place-items: center;
   min-height: 100dvh;
   padding: $space-6 $space-4;
   text-align: center;
+
+  h1 {
+    margin: 0;
+  }
 }
 
-.title {
+.code {
   margin: 0;
   font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
   color: var(--color-primary);
+}
+
+.body {
+  margin: 0 0 $space-3;
+  color: var(--color-text-muted);
 }

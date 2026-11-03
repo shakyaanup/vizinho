@@ -1,0 +1,19 @@
+@use "styles/tokens" as *;
+
+// Hidden until focused: lets keyboard users jump past the header (WCAG 2.4.1).
+.skipLink {
+  position: fixed;
+  top: $space-2;
+  left: $space-2;
+  z-index: $z-toast;
+  padding: $space-2 $space-4;
+  font-weight: $font-weight-semibold;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-radius: $radius-md;
+  transform: translateY(-200%);
+
+  &:focus-visible {
+    transform: none;
+  }
+}

@@ -1,10 +1,11 @@
 begin;
 \ir _helpers.psql
 
-select plan(20);
+select plan(22);
 
 select tests.create_user('alice@test.local', '{"full_name": "Alice Silva", "locale": "pt-PT"}') as alice \gset
 select tests.create_user('bob@test.local') as bob \gset
+select tests.create_user('tina@test.local', '{"full_name": "Tina", "terms_version": "2026-11"}') as tina \gset
 -- Attacker tries to self-assign admin through user-controlled metadata.
 select tests.create_user('mallory@test.local', '{"full_name": "Mallory", "role": "admin", "app_roles": ["admin"]}') as mallory \gset
 select tests.create_user('carol@test.local', '{"full_name": "Carol Admin"}') as carol \gset
@@ -33,6 +34,17 @@ select results_eq(
   format($$ select role::text from public.user_roles where user_id = %L $$, :'mallory'),
   $$ values ('customer'::text) $$,
   'roles in user metadata are ignored (no privilege escalation at sign-up)'
+);
+
+select results_eq(
+  format($$ select document::text, version from public.legal_acceptances where user_id = %L order by 1 $$, :'tina'),
+  $$ values ('privacy'::text, '2026-11'::text), ('terms'::text, '2026-11'::text) $$,
+  'accepting the terms at sign-up records terms and privacy acceptance'
+);
+
+select is_empty(
+  format($$ select 1 from public.legal_acceptances where user_id = %L $$, :'bob'),
+  'no acceptance is recorded when none was given'
 );
 
 -- --- Access token hook --------------------------------------------------------

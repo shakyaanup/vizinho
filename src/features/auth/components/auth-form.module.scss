@@ -1,0 +1,74 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.form {
+  display: grid;
+  gap: $space-5;
+}
+
+.inlineLink {
+  justify-self: end;
+  margin-top: (-$space-2);
+  font-size: $font-size-sm;
+}
+
+.footer {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.checkboxRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: $space-3;
+  align-items: start;
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+
+  @include focus-ring;
+}
+
+.checkboxLabel {
+  font-size: $font-size-sm;
+  cursor: pointer;
+}
+
+.checkboxError {
+  display: flex;
+  grid-column: 2;
+  gap: $space-1;
+  align-items: center;
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-danger);
+
+  // Same "!" marker as Field errors, so errors never rely on color alone.
+  &::before {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 1.1em;
+    height: 1.1em;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: var(--color-text-inverse);
+    content: "!";
+    background: var(--color-danger);
+    border-radius: $radius-full;
+  }
+}
+
+.hint {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}

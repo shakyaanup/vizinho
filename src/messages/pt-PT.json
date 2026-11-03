@@ -1,0 +1,115 @@
+{
+  "Metadata": {
+    "description": "Receba as suas encomendas num vizinho de confiança ou numa loja local em Portugal."
+  },
+  "Common": {
+    "appName": "Vizinho",
+    "close": "Fechar",
+    "dismiss": "Dispensar",
+    "notifications": "Notificações",
+    "required": "(obrigatório)",
+    "skipToContent": "Saltar para o conteúdo",
+    "language": "Idioma",
+    "loading": "A carregar…",
+    "showPassword": "Mostrar palavra-passe",
+    "hidePassword": "Ocultar palavra-passe"
+  },
+  "Home": {
+    "eyebrow": "Recolha de encomendas, de vizinho para vizinho",
+    "title": "Nunca mais perca uma entrega",
+    "lead": "Receba as suas encomendas num vizinho verificado ou numa loja perto de si e levante-as quando lhe der jeito, com um código de recolha único.",
+    "createAccount": "Criar conta",
+    "logIn": "Entrar",
+    "steps": {
+      "title": "Como funciona",
+      "find": "Encontre um anfitrião perto de si no mapa",
+      "reserve": "Reserve e use a morada dele na compra",
+      "collect": "Levante com o seu código único"
+    },
+    "demo": {
+      "title": "Explore a demonstração",
+      "body": "Este é um projeto de portefólio com dados fictícios. Entre diretamente com uma conta pronta a usar:",
+      "customer": "Experimentar como cliente",
+      "customerHint": "Encontre anfitriões e reserve uma recolha",
+      "host": "Experimentar como anfitrião",
+      "hostHint": "Aceite encomendas e entregue-as",
+      "admin": "Experimentar como administrador",
+      "adminHint": "Aprove anfitriões e audite a custódia"
+    },
+    "disclaimer": "O Vizinho não tem integração com lojas nem transportadoras. A possibilidade de entrega na morada de um anfitrião depende de cada loja e transportadora."
+  },
+  "Auth": {
+    "email": "Email",
+    "password": "Palavra-passe",
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Bem-vindo de volta ao Vizinho.",
+      "submit": "Entrar",
+      "forgotPassword": "Esqueceu-se da palavra-passe?",
+      "noAccount": "Novo no Vizinho?",
+      "signUpLink": "Criar conta"
+    },
+    "signup": {
+      "title": "Crie a sua conta",
+      "subtitle": "É gratuito durante o piloto do Vizinho.",
+      "fullName": "Nome completo",
+      "passwordHint": "Pelo menos 8 caracteres, com letras e números.",
+      "acceptTerms": "Aceito os Termos de Serviço e a Política de Privacidade",
+      "submit": "Criar conta",
+      "haveAccount": "Já tem conta?",
+      "logInLink": "Entrar",
+      "successTitle": "Verifique o seu email",
+      "successBody": "Se for possível registar {email}, enviámos um link de confirmação. Abra-o para ativar a sua conta.",
+      "localMailHint": "A executar localmente? Os emails chegam ao Mailpit em http://127.0.0.1:54324."
+    },
+    "forgot": {
+      "title": "Redefinir palavra-passe",
+      "subtitle": "Indique o seu email e enviamos-lhe um link para a redefinir.",
+      "submit": "Enviar link",
+      "successTitle": "Verifique o seu email",
+      "successBody": "Se existir uma conta para {email}, o link está a caminho. Expira em 1 hora.",
+      "backToLogin": "Voltar a entrar"
+    },
+    "reset": {
+      "title": "Escolha uma nova palavra-passe",
+      "newPassword": "Nova palavra-passe",
+      "submit": "Guardar palavra-passe"
+    },
+    "signOut": "Sair",
+    "errors": {
+      "invalidCredentials": "Email ou palavra-passe incorretos.",
+      "emailNotConfirmed": "Confirme primeiro o seu email. Procure o link na sua caixa de entrada.",
+      "rateLimited": "Demasiadas tentativas. Aguarde um momento e tente novamente.",
+      "linkInvalid": "Este link é inválido ou expirou. Peça um novo.",
+      "unexpected": "Ocorreu um erro. Tente novamente.",
+      "emailInvalid": "Indique um endereço de email válido.",
+      "passwordRequired": "Indique a sua palavra-passe.",
+      "passwordTooShort": "Use pelo menos 8 caracteres.",
+      "passwordWeak": "Use letras e números.",
+      "passwordTooLong": "Use no máximo 72 caracteres.",
+      "passwordSame": "Escolha uma palavra-passe diferente da atual.",
+      "nameRequired": "Indique o seu nome (2–100 caracteres).",
+      "termsRequired": "Tem de aceitar os termos para continuar.",
+      "demoUnavailable": "A conta de demonstração não está disponível. Tente mais tarde."
+    }
+  },
+  "Account": {
+    "title": "A sua conta",
+    "welcome": "Olá, {name}",
+    "confirmed": "O seu email está confirmado. Bem-vindo ao Vizinho!",
+    "passwordUpdated": "A sua palavra-passe foi atualizada.",
+    "email": "Email",
+    "roles": "Perfis",
+    "roleNames": {
+      "customer": "Cliente",
+      "host": "Anfitrião",
+      "admin": "Administrador"
+    },
+    "comingSoon": "Os painéis de cliente, anfitrião e administrador chegam no próximo passo."
+  },
+  "NotFound": {
+    "title": "Página não encontrada",
+    "body": "A página que procura não existe ou mudou de sítio.",
+    "home": "Ir para a página inicial"
+  }
+}
