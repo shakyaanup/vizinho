@@ -40,7 +40,7 @@ Local services: Supabase Studio http://127.0.0.1:54323 · email inbox (Mailpit) 
 
 ```bash
 pnpm check          # typecheck, ESLint, Stylelint, Prettier, unit tests
-pnpm db:test        # 81 pgTAP assertions: RLS, grants, append-only logs
+pnpm db:test        # 83 pgTAP assertions: RLS, grants, append-only logs
 pnpm build
 ```
 

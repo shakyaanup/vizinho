@@ -1,0 +1,25 @@
+@use "styles/tokens" as *;
+
+.avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-full;
+}
+
+.sm {
+  width: 2rem;
+  height: 2rem;
+  font-size: $font-size-xs;
+}
+
+.md {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: $font-size-sm;
+}

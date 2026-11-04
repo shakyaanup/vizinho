@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { LOCALE_URL_PREFIXES, routing } from "@/i18n/routing";
+import { homePathForRoles, parseRoles, type AppRole } from "@/lib/auth/roles";
 import { publicEnv } from "@/lib/env";
 
 const handleI18nRouting = createIntlMiddleware(routing);
@@ -12,10 +13,25 @@ const handleI18nRouting = createIntlMiddleware(routing);
 const PROTECTED_PREFIXES = [
   "/account",
   "/reset-password",
+  "/dashboard",
   "/customer",
   "/host",
   "/admin",
 ];
+
+const AREA_ROLES: Record<string, AppRole> = {
+  "/customer": "customer",
+  "/host": "host",
+  "/admin": "admin",
+};
+
+/** The role an area path requires, e.g. "/host/requests" → "host". */
+function requiredRole(path: string): AppRole | undefined {
+  const area = Object.keys(AREA_ROLES).find(
+    (a) => path === a || path.startsWith(`${a}/`),
+  );
+  return area ? AREA_ROLES[area] : undefined;
+}
 
 const localePrefixes: string[] = Object.values(LOCALE_URL_PREFIXES);
 
@@ -71,15 +87,24 @@ export async function proxy(request: NextRequest) {
   const signedIn = Boolean(data?.claims?.sub);
 
   const { prefix, path } = splitLocalePrefix(request.nextUrl.pathname);
-  const response =
-    !signedIn && isProtected(path)
-      ? NextResponse.redirect(
-          new URL(
-            `${prefix}/login?next=${encodeURIComponent(path + request.nextUrl.search)}`,
-            request.url,
-          ),
-        )
-      : handleI18nRouting(request);
+  const roles = parseRoles(data?.claims?.app_roles);
+  const role = requiredRole(path);
+  const redirectTo = (target: string) =>
+    NextResponse.redirect(new URL(`${prefix}${target}`, request.url));
+
+  let response;
+  if (!signedIn && isProtected(path)) {
+    response = redirectTo(
+      `/login?next=${encodeURIComponent(path + request.nextUrl.search)}`,
+    );
+  } else if (signedIn && path === "/dashboard") {
+    response = redirectTo(homePathForRoles(roles));
+  } else if (signedIn && role && !roles.includes(role)) {
+    // e.g. a customer opening /admin goes to their own area instead.
+    response = redirectTo(homePathForRoles(roles));
+  } else {
+    response = handleI18nRouting(request);
+  }
 
   cookiesToWrite.forEach(({ name, value, options }) =>
     response.cookies.set(name, value, options),

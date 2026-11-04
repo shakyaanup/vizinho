@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-Phase 1 in progress: Steps 1–4 done (scaffold, design system, database, auth). **Next: Step 5, role-based app shells.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+Phase 1 in progress: Steps 1–5 done (scaffold, design system, database, auth, role-based app shells). **Next: Step 6, mock data, e2e suite in the repo, and CI.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -83,6 +83,16 @@ Playwright + Chromium are installed (e2e suite added in Step 6).
 - **Demo accounts** (seeded, password `VizinhoDemo2026`): `customer@`, `host@`, `admin@demo.vizinho.app`.
 - Auth emails use `supabase/templates/*.html` (bilingual, `token_hash` links to `/[locale]/auth/confirm`). Locally they land in Mailpit.
 
+## App shell & areas
+
+- `/customer`, `/host`, `/admin` each use `<AppShell area="…">` in their `layout.tsx`. The shell (nav, top bar) is static; the user menu and page stream behind `<Suspense>`, and the page renders inside `RoleGate` (`requireRole`).
+- Guards are layered: the proxy redirects by JWT roles (fast path) → `RoleGate` (authoritative) → data loaders call `requireRole` themselves → RLS.
+- **Nav items** are defined once in `src/components/layout/AppShell/nav-config.ts` (max 5 per area, for the phone tab bar). Unbuilt sections render `<ComingSoon area section phase />`.
+- **Data loaders** (`src/features/<domain>/queries.ts`) resolve the current user themselves. Never accept a user id from the caller.
+- After login, Server Actions redirect straight to the user's area (`homePathForRoles`). `/dashboard` is only for direct visits, because chaining redirects during a client transition leaves the wrong URL in the address bar.
+- **Theme:** `useTheme()` (`src/lib/theme`), stored in localStorage and applied pre-paint by `themeInitScript` in `<head>`. `<html>`/`<body>` have `suppressHydrationWarning` for that script and for browser extensions.
+- Radix `asChild` needs exactly **one** child element. `DropdownMenuRadioItem` forbids `asChild`; for links in menus use `DropdownMenuItem asChild`.
+
 ## Database conventions
 
 - **Deny by default:** the foundation migration removes Supabase's automatic grants. Every new table needs explicit `grant`s (column-level for writable columns) **and** RLS policies. Every new function is non-executable until granted.
@@ -93,7 +103,7 @@ Playwright + Chromium are installed (e2e suite added in Step 6).
 
 ## Conventions
 
-- **UI kit:** `src/components/ui/` has Button, Spinner, Field, Input, Card, Dialog, Toast. Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
+- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, PasswordInput, Spinner, StatCard, Toast. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
 
 - **Layout:** routes in `src/app/{customer,host,admin}`. Domain logic in `src/features/<domain>/{actions,queries,schemas}.ts`. Shared UI in `src/components`.
 - **Server first:** default to Server Components. Add `"use client"` only for interactivity. Mutations are Server Actions that zod-validate input and then call an RPC.

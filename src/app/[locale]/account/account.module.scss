@@ -27,10 +27,6 @@
     width: 100%;
   }
 
-  > form {
-    width: auto;
-  }
-
   h1 {
     margin: 0;
     font-size: $font-size-2xl;
@@ -73,7 +69,8 @@
   border-radius: $radius-full;
 }
 
-.muted {
-  margin: 0;
-  color: var(--color-text-muted);
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
 }

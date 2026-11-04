@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 import { routing } from "@/i18n/routing";
+import { themeInitScript } from "@/lib/theme/theme";
 import { Providers } from "./providers";
 import "../globals.scss";
 import styles from "./layout.module.scss";
@@ -40,7 +41,13 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
   const t = await getTranslations("Common");
 
   return (
-    <html lang={locale} className={geistSans.variable}>
+    // suppressHydrationWarning: the theme script below may set data-theme on
+    // <html> before React hydrates (attribute-only, this element only).
+    <html lang={locale} className={geistSans.variable} suppressHydrationWarning>
+      <head>
+        {/* Applies the saved light/dark theme before first paint (no flash). */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       {/* Browser extensions (ColorZilla, Grammarly, password managers) inject
           attributes into <body> before React hydrates. This ignores attribute
           differences on <body> only; mismatches inside the page still report. */}

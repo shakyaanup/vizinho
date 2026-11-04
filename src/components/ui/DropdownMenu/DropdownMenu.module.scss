@@ -1,0 +1,90 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.content {
+  z-index: $z-modal;
+  min-width: 15rem;
+  max-width: calc(100vw - #{$space-6});
+  padding: $space-2;
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-lg);
+
+  @include motion-safe {
+    &[data-state="open"] {
+      animation: menu-in $duration-base $ease-out;
+    }
+  }
+}
+
+.item {
+  position: relative;
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+  min-height: $touch-target;
+  padding: 0 $space-3;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  border-radius: $radius-md;
+
+  // Radix moves focus with the keyboard and marks it with data-highlighted.
+  &[data-highlighted] {
+    background: var(--color-surface-sunken);
+  }
+
+  &[data-disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.radioItem {
+  padding-left: $space-8;
+}
+
+.indicator {
+  position: absolute;
+  left: $space-2;
+  display: inline-grid;
+  place-items: center;
+
+  svg {
+    color: var(--color-primary);
+  }
+}
+
+.label {
+  padding: $space-2 $space-3 $space-1;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.separator {
+  height: 1px;
+  margin: $space-2 (-$space-2);
+  background: var(--color-border);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}

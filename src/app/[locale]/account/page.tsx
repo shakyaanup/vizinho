@@ -3,9 +3,11 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { SignOutButton } from "@/features/auth/components/SignOutButton";
+import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import styles from "./account.module.scss";
@@ -58,8 +60,12 @@ async function AccountDetails({
           </dd>
         </dl>
       </Card>
-      <p className={styles.muted}>{t("comingSoon")}</p>
-      <SignOutButton />
+      <div className={styles.actions}>
+        <Button asChild>
+          <Link href="/dashboard">{t("goToDashboard")}</Link>
+        </Button>
+        <SignOutButton />
+      </div>
     </>
   );
 }

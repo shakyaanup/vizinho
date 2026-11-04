@@ -1,0 +1,334 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+$sidebar-width: 16rem;
+$topbar-height: 3.75rem;
+$tabbar-height: 4.25rem;
+
+.shell {
+  min-height: 100dvh;
+
+  @include respond-to("lg") {
+    display: grid;
+    grid-template-columns: $sidebar-width 1fr;
+  }
+}
+
+// ---------- Sidebar (desktop) ----------
+.sidebar {
+  display: none;
+
+  @include respond-to("lg") {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    height: 100dvh;
+    padding: $space-5 $space-3;
+    overflow-y: auto;
+    background: var(--color-surface);
+    border-right: $border-width solid var(--color-border);
+  }
+}
+
+.logo,
+.topbarLogo {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: var(--color-primary);
+  text-decoration: none;
+  border-radius: $radius-sm;
+
+  @include focus-ring;
+}
+
+.logo {
+  padding: 0 $space-3;
+}
+
+.areaBadge {
+  align-self: flex-start;
+  padding: 0.125rem $space-2;
+  margin: 0 $space-3 $space-4;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--color-accent-subtle);
+  border-radius: $radius-full;
+}
+
+// ---------- Top bar ----------
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+  height: $topbar-height;
+  padding: 0 $space-4;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  border-bottom: $border-width solid var(--color-border);
+  backdrop-filter: blur(12px);
+
+  @include respond-to("lg") {
+    justify-content: flex-end;
+    padding: 0 $space-8;
+  }
+}
+
+.topbarLogo {
+  @include respond-to("lg") {
+    display: none;
+  }
+}
+
+.topbarArea {
+  margin-right: auto;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text-muted);
+
+  @include respond-to("lg") {
+    display: none;
+  }
+}
+
+// ---------- User menu ----------
+.userTrigger {
+  display: inline-flex;
+  gap: $space-2;
+  align-items: center;
+  min-height: $touch-target;
+  padding: $space-1;
+  color: var(--color-text);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: $radius-full;
+
+  @include focus-ring;
+
+  &:hover,
+  &[data-state="open"] {
+    background: var(--color-surface-sunken);
+  }
+
+  @include respond-to("lg") {
+    padding: $space-1 $space-3 $space-1 $space-1;
+  }
+}
+
+.userName,
+.userChevron {
+  display: none;
+
+  @include respond-to("lg") {
+    display: inline;
+  }
+}
+
+.userName {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.userChevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-text-muted);
+}
+
+.userSkeleton {
+  width: 2rem;
+  height: 2rem;
+  background: var(--color-surface-sunken);
+  border-radius: $radius-full;
+}
+
+.userSummary {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+  padding: $space-2 $space-3;
+}
+
+.userSummaryText {
+  display: grid;
+  min-width: 0;
+}
+
+.userSummaryName {
+  font-weight: $font-weight-semibold;
+}
+
+.userSummaryEmail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.menuIconSpacer {
+  flex-shrink: 0;
+  width: 1.125rem;
+}
+
+.labelIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+  vertical-align: -0.125rem;
+}
+
+// ---------- Main ----------
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 64rem;
+  padding: $space-5 $space-4
+    calc(#{$tabbar-height} + #{$space-8} + env(safe-area-inset-bottom));
+  margin: 0 auto;
+
+  @include respond-to("lg") {
+    padding: $space-8;
+  }
+}
+
+.pageLoading {
+  display: grid;
+  place-items: center;
+  min-height: 40dvh;
+}
+
+// ---------- Navigation ----------
+.navList {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebarList {
+  display: grid;
+  gap: $space-1;
+
+  .navLink {
+    gap: $space-3;
+    min-height: $touch-target;
+    padding: 0 $space-3;
+    border-radius: $radius-md;
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  font-weight: $font-weight-medium;
+  color: var(--color-text-muted);
+  text-decoration: none;
+
+  @include focus-ring(-2px);
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+}
+
+// Active = bold text + colored icon + background, not color alone.
+.navLinkActive {
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+  background: var(--color-primary-subtle);
+
+  .navIcon {
+    color: var(--color-primary);
+  }
+
+  &:hover {
+    background: var(--color-primary-subtle);
+  }
+}
+
+.navIcon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+// ---------- Bottom tab bar (phones) ----------
+.bottomNav {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: $z-sticky;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--color-surface);
+  border-top: $border-width solid var(--color-border);
+
+  @include respond-to("lg") {
+    display: none;
+  }
+}
+
+.tabs {
+  display: flex;
+  height: $tabbar-height;
+
+  li {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .navLink {
+    flex-direction: column;
+    gap: 0.125rem;
+    justify-content: center;
+    height: 100%;
+    padding: 0 0.125rem;
+    font-size: 0.6875rem;
+    line-height: 1.15;
+    text-align: center;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  .navLinkActive {
+    background: transparent;
+
+    .navIcon {
+      padding: 0.125rem 0;
+      background: var(--color-primary-subtle);
+      border-radius: $radius-full;
+    }
+  }
+
+  .navIcon {
+    width: 3.25rem;
+    height: 1.75rem;
+    padding: 0.25rem 0;
+  }
+
+  .navLabel {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+  }
+}

@@ -105,11 +105,116 @@
       "host": "Anfitrião",
       "admin": "Administrador"
     },
-    "comingSoon": "Os painéis de cliente, anfitrião e administrador chegam no próximo passo."
+    "goToDashboard": "Ir para o seu painel"
   },
   "NotFound": {
     "title": "Página não encontrada",
     "body": "A página que procura não existe ou mudou de sítio.",
     "home": "Ir para a página inicial"
+  },
+  "Nav": {
+    "mainNavigation": "Navegação principal",
+    "areas": {
+      "customer": "Cliente",
+      "host": "Anfitrião",
+      "admin": "Administração"
+    },
+    "customer": {
+      "home": "Início",
+      "findHost": "Encontrar anfitrião",
+      "parcels": "Encomendas",
+      "help": "Ajuda"
+    },
+    "host": {
+      "dashboard": "Painel",
+      "requests": "Pedidos",
+      "storage": "Armazém",
+      "schedule": "Horário",
+      "earnings": "Ganhos"
+    },
+    "admin": {
+      "overview": "Resumo",
+      "hosts": "Anfitriões",
+      "reservations": "Reservas",
+      "incidents": "Incidentes",
+      "audit": "Registo de auditoria"
+    }
+  },
+  "Shell": {
+    "userMenu": "Menu da conta",
+    "account": "Dados da conta",
+    "switchArea": "Mudar de área",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Escuro",
+    "language": "Idioma",
+    "loadingUser": "A carregar a sua conta…",
+    "loadingPage": "A carregar…"
+  },
+  "Dashboard": {
+    "greeting": "Olá, {name}",
+    "customer": {
+      "subtitle": "Acompanhe as suas encomendas e encontre anfitriões perto de si.",
+      "activeTitle": "Reservas ativas",
+      "emptyTitle": "Nenhuma encomenda a caminho",
+      "emptyBody": "Encontre um anfitrião verificado perto de si e reserve um lugar antes de encomendar.",
+      "findHost": "Encontrar anfitrião",
+      "howTitle": "Como funciona o Vizinho",
+      "howBody": "Reserve um anfitrião, use a morada que ele partilha na compra e levante a encomenda com um código único."
+    },
+    "host": {
+      "subtitle": "Gira pedidos, encomendas em armazém e a sua disponibilidade.",
+      "listingTitle": "O seu anúncio",
+      "status": {
+        "draft": "Rascunho",
+        "pending_review": "Em análise",
+        "approved": "Aprovado",
+        "rejected": "Não aprovado",
+        "suspended": "Suspenso"
+      },
+      "paused": "Em pausa",
+      "area": "Zona",
+      "capacity": "Capacidade",
+      "capacityValue": "Até {count, plural, one {# encomenda} other {# encomendas}} de cada vez",
+      "openingSlots": "Horário",
+      "openingSlotsValue": "{count, plural, =0 {Não definido} one {# período semanal} other {# períodos semanais}}",
+      "pendingTitle": "Pedidos pendentes",
+      "storedTitle": "Encomendas em armazém",
+      "noListing": "Ainda não tem um anúncio de anfitrião."
+    },
+    "admin": {
+      "subtitle": "O estado da plataforma num relance.",
+      "users": "Contas",
+      "hostsApproved": "Anfitriões aprovados",
+      "hostsPending": "Anfitriões por analisar",
+      "reservationsActive": "Reservas ativas",
+      "openIncidents": "Incidentes abertos",
+      "reviewHosts": "Analisar anfitriões"
+    }
+  },
+  "ComingSoon": {
+    "badge": "Disponível na Fase {phase}",
+    "body": "Esta parte do Vizinho está no plano de desenvolvimento.",
+    "backToDashboard": "Voltar ao painel",
+    "sections": {
+      "customer": {
+        "findHost": "Um mapa em ecrã inteiro que usa a sua localização para mostrar anfitriões aprovados por perto, com horários e regras.",
+        "parcels": "As suas reservas e encomendas, com estado em tempo real e códigos de recolha únicos.",
+        "help": "Respostas a perguntas frequentes e uma forma de reportar um problema com uma encomenda."
+      },
+      "host": {
+        "requests": "Aceite ou recuse pedidos de reserva antes de a sua morada ser partilhada.",
+        "storage": "Registe encomendas com foto, veja o que está guardado e entregue-as com o código de recolha.",
+        "schedule": "Defina o horário semanal, ausências e quantas encomendas pode guardar.",
+        "earnings": "Os seus ganhos por encomenda e pagamentos."
+      },
+      "admin": {
+        "hosts": "Analise e aprove candidaturas de anfitriões e suspenda-os se necessário.",
+        "reservations": "O ciclo de vida e o registo de custódia de cada reserva.",
+        "incidents": "Investigue encomendas danificadas, desaparecidas ou desconhecidas e resolva disputas.",
+        "audit": "Um registo só de acréscimo de todas as ações privilegiadas."
+      }
+    }
   }
 }

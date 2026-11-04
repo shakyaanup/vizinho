@@ -4,7 +4,7 @@ import type { AuthError } from "@supabase/supabase-js";
 import { hasLocale } from "next-intl";
 import { getPathname, redirect } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
-import { APP_ROLES, type AppRole } from "@/lib/auth/roles";
+import { APP_ROLES, homePathForRoles, parseRoles, type AppRole } from "@/lib/auth/roles";
 import { safeRedirectPath } from "@/lib/auth/safe-redirect";
 import { publicEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
@@ -53,7 +53,16 @@ function authErrorCode(error: AuthError, context: string): AuthErrorCode {
   }
 }
 
-const DEFAULT_AFTER_LOGIN = "/account";
+/**
+ * The signed-in user's own area (/customer, /host or /admin), read from the
+ * fresh session's verified claims. Redirecting there directly avoids a second
+ * hop through /dashboard, which during a client-side transition would leave
+ * the address bar showing /dashboard.
+ */
+async function homeAfterLogin(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data } = await supabase.auth.getClaims();
+  return homePathForRoles(parseRoles(data?.claims?.app_roles));
+}
 
 // -----------------------------------------------------------------------------
 
@@ -87,7 +96,10 @@ export async function logIn(
     };
   }
 
-  redirect({ href: safeRedirectPath(formData.get("next"), DEFAULT_AFTER_LOGIN), locale });
+  redirect({
+    href: safeRedirectPath(formData.get("next"), await homeAfterLogin(supabase)),
+    locale,
+  });
   return { status: "idle" }; // unreachable: redirect() throws
 }
 
@@ -215,6 +227,7 @@ export async function demoLogIn(
     return { status: "error", formError: "demoUnavailable" };
   }
 
-  redirect({ href: DEFAULT_AFTER_LOGIN, locale });
+  // Demo visitors land straight in the area they chose.
+  redirect({ href: `/${role}`, locale });
   return { status: "idle" };
 }

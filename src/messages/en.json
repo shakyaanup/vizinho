@@ -105,11 +105,116 @@
       "host": "Host",
       "admin": "Admin"
     },
-    "comingSoon": "Your customer, host and admin dashboards arrive in the next step."
+    "goToDashboard": "Go to your dashboard"
   },
   "NotFound": {
     "title": "Page not found",
     "body": "The page you're looking for doesn't exist or has moved.",
     "home": "Go to the home page"
+  },
+  "Nav": {
+    "mainNavigation": "Main navigation",
+    "areas": {
+      "customer": "Customer",
+      "host": "Host",
+      "admin": "Admin"
+    },
+    "customer": {
+      "home": "Home",
+      "findHost": "Find a host",
+      "parcels": "My parcels",
+      "help": "Help"
+    },
+    "host": {
+      "dashboard": "Dashboard",
+      "requests": "Requests",
+      "storage": "Storage",
+      "schedule": "Schedule",
+      "earnings": "Earnings"
+    },
+    "admin": {
+      "overview": "Overview",
+      "hosts": "Hosts",
+      "reservations": "Reservations",
+      "incidents": "Incidents",
+      "audit": "Audit log"
+    }
+  },
+  "Shell": {
+    "userMenu": "Account menu",
+    "account": "Account details",
+    "switchArea": "Switch area",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language",
+    "loadingUser": "Loading your account…",
+    "loadingPage": "Loading…"
+  },
+  "Dashboard": {
+    "greeting": "Hello, {name}",
+    "customer": {
+      "subtitle": "Track your parcels and find hosts nearby.",
+      "activeTitle": "Active reservations",
+      "emptyTitle": "No parcels on the way",
+      "emptyBody": "Find a verified host near you and reserve a pickup spot before you order.",
+      "findHost": "Find a host",
+      "howTitle": "How Vizinho works",
+      "howBody": "Reserve a host, use the address they share at checkout, then collect your parcel with a one-time code."
+    },
+    "host": {
+      "subtitle": "Manage requests, parcels in storage and your availability.",
+      "listingTitle": "Your listing",
+      "status": {
+        "draft": "Draft",
+        "pending_review": "In review",
+        "approved": "Approved",
+        "rejected": "Not approved",
+        "suspended": "Suspended"
+      },
+      "paused": "Paused",
+      "area": "Area",
+      "capacity": "Capacity",
+      "capacityValue": "Up to {count, plural, one {# parcel} other {# parcels}} at a time",
+      "openingSlots": "Opening hours",
+      "openingSlotsValue": "{count, plural, =0 {Not set} one {# weekly slot} other {# weekly slots}}",
+      "pendingTitle": "Requests waiting",
+      "storedTitle": "Parcels in storage",
+      "noListing": "You don't have a host listing yet."
+    },
+    "admin": {
+      "subtitle": "Platform health at a glance.",
+      "users": "Accounts",
+      "hostsApproved": "Approved hosts",
+      "hostsPending": "Hosts awaiting review",
+      "reservationsActive": "Active reservations",
+      "openIncidents": "Open incidents",
+      "reviewHosts": "Review hosts"
+    }
+  },
+  "ComingSoon": {
+    "badge": "Coming in Phase {phase}",
+    "body": "This part of Vizinho is on the roadmap.",
+    "backToDashboard": "Back to dashboard",
+    "sections": {
+      "customer": {
+        "findHost": "A full-screen map that uses your location to show approved hosts nearby, with their hours and rules.",
+        "parcels": "Your reservations and parcels, with live status updates and one-time pickup codes.",
+        "help": "Answers to common questions and a way to report a problem with a parcel."
+      },
+      "host": {
+        "requests": "Accept or decline reservation requests before your address is shared.",
+        "storage": "Check parcels in with a photo, see what's stored and hand parcels over with a pickup code.",
+        "schedule": "Set your weekly opening hours, time off and how many parcels you can hold.",
+        "earnings": "Your per-parcel earnings and payouts."
+      },
+      "admin": {
+        "hosts": "Review and approve host applications, and suspend hosts if needed.",
+        "reservations": "Every reservation's lifecycle and custody trail.",
+        "incidents": "Investigate damaged, missing or unknown parcels and resolve disputes.",
+        "audit": "An append-only log of every privileged action."
+      }
+    }
   }
 }
