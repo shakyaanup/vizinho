@@ -41,7 +41,10 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
 
   return (
     <html lang={locale} className={geistSans.variable}>
-      <body>
+      {/* Browser extensions (ColorZilla, Grammarly, password managers) inject
+          attributes into <body> before React hydrates. This ignores attribute
+          differences on <body> only; mismatches inside the page still report. */}
+      <body suppressHydrationWarning>
         <a href="#main" className={styles.skipLink}>
           {t("skipToContent")}
         </a>
