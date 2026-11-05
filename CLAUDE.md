@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-Phase 1 in progress: Steps 1–5 done (scaffold, design system, database, auth, role-based app shells). **Next: Step 6, mock data, e2e suite in the repo, and CI.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phase 1 complete** (scaffold, design system, database, auth, role-based app shells, mock data, e2e suite, CI). **Next: Phase 2, host onboarding and admin approval**, after the owner's review. Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -49,6 +49,7 @@ pnpm typecheck           # next typegen + tsc (typegen creates global types like
 pnpm lint | lint:styles  # ESLint | Stylelint (SCSS)
 pnpm format              # Prettier write
 pnpm test | test:watch   # Vitest
+pnpm test:e2e             # Playwright: builds, serves on :3100, runs tests/e2e (needs db:start + a seeded DB)
 ```
 
 Database (Docker must be running):
@@ -62,7 +63,9 @@ pnpm db:lint             # plpgsql_check on public + private schemas
 pnpm db:types            # regenerate src/types/database.ts (after every migration)
 ```
 
-Playwright + Chromium are installed (e2e suite added in Step 6).
+**E2E (`tests/e2e`):** import `test`/`expect` from `./fixtures`, not `@playwright/test`. The fixture fails any test that logs a browser console error (use `consoleErrors.allow(/…/)` for an expected one). Use `visible()` locators, `demoLogin()`, and `uniqueEmail()` for sign-ups so the suite can re-run without a reset. Tests may assert on seed counts; update them when the seed changes. The default viewport is a phone (390×844).
+
+**CI (`.github/workflows/ci.yml`):** `checks` (pnpm check) and `app` (local Supabase → pgTAP, db lint, generated-types drift, build, Playwright) on every push to main and every PR. It uses no repository secrets.
 
 ## Next.js 16.4 specifics (differs from older versions)
 
@@ -98,6 +101,7 @@ Playwright + Chromium are installed (e2e suite added in Step 6).
 - **Deny by default:** the foundation migration removes Supabase's automatic grants. Every new table needs explicit `grant`s (column-level for writable columns) **and** RLS policies. Every new function is non-executable until granted.
 - Helpers used by policies/RPCs live in the `private` schema (not exposed by the API). `SECURITY DEFINER` functions always `set search_path = ''` and fully qualify names (`public.x`, `extensions.st_*`).
 - Wrap `auth.uid()`/helpers in policies as `(select …)` so Postgres evaluates them once per query, not per row.
+- **Seed (`supabase/seed.sql`)** is mock data only, with fixed id prefixes: demo users `11111111-`/`22222222-`/`33333333-`, Hugo's host `44444444-`, mock owners `aaaaaaaa-`, mock hosts `bbbbbbbb-`, customers `cccccccc-`, reservations `dddddddd-`, parcels `eeeeeeee-`. Times are relative to `now()`. Seeded history must stay consistent with the state machine (`06_seed_integrity.test.sql` checks it). Only the three demo accounts have a known password.
 - `01_security_baseline.test.sql` is the guard test (RLS on every table, no anon grants, no client writes on state tables, pinned search paths). Update its table list when adding a table.
 - pgTAP helpers: `supabase/tests/database/_helpers.psql` (`tests.create_user`, `tests.authenticate_as`, `tests.create_approved_host`, …). Switch back with `reset role;`.
 

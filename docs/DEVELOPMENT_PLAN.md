@@ -1,6 +1,6 @@
 # Vizinho — Development Plan (v0.1, for review)
 
-Status: **APPROVED (with the changes in §0). Next: Phase 1.**
+Status: **APPROVED (with the changes in §0). Phase 1 complete (2026-11-05). Next: Phase 2.**
 Source: `docs/VIZINHO_PROJECT_BRIEF.md` (`docs/conversation.md` was referenced but does not exist in the repo).
 
 ---
@@ -289,6 +289,8 @@ Each phase ends with a demo, green CI, and an update to this plan.
 9. CI pipeline, README setup instructions, first ADRs.
 
 **Done when:** each seeded role can log in, lands on its dashboard, cannot reach other roles' routes or rows, and all tests pass in CI.
+
+> **Done 2026-11-05.** Seed: 21 hosts across Lisbon (18 approved, 2 awaiting review, 1 suspended), 3 extra customers, and 8 reservations covering the main statuses, each with a matching custody trail. Tests: 88 pgTAP assertions (including seed integrity), 60 unit tests, 24 Playwright tests (`tests/e2e`). GitHub Actions runs all of them plus a production build on every push and PR (`.github/workflows/ci.yml`).
 
 ### Phase 2: Hosts and admin approval
 

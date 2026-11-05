@@ -1,0 +1,100 @@
+# Runs on every push to main and every pull request. Two jobs run in parallel:
+#   checks: typecheck, ESLint, Stylelint, Prettier, unit tests (no services)
+#   app:    local Supabase in Docker → pgTAP, plpgsql lint, generated-types
+#           drift, production build, Playwright end-to-end tests
+# Nothing here uses repository secrets: the Supabase stack is local to the
+# runner and its keys are generated on the fly.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, lint, unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4 # version comes from "packageManager"
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+
+  app:
+    name: Database, build, end-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Applies every migration and seed.sql. Services the tests don't use are
+      # skipped to save time.
+      - name: Start local Supabase
+        run: pnpm exec supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
+
+      - name: Export Supabase keys
+        run: |
+          eval "$(pnpm exec supabase status -o env 2>/dev/null)"
+          echo "::add-mask::$SECRET_KEY"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "SUPABASE_SECRET_KEY=$SECRET_KEY"
+          } >> "$GITHUB_ENV"
+
+      - name: pgTAP tests
+        run: pnpm db:test
+
+      - name: plpgsql lint
+        run: pnpm db:lint
+
+      - name: Generated types match the schema
+        run: |
+          pnpm db:types
+          git diff --exit-code -- src/types/database.ts || {
+            echo "::error::src/types/database.ts is out of date. Run 'pnpm db:types' and commit."
+            exit 1
+          }
+
+      - run: pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      - name: Stop Supabase
+        if: always()
+        run: pnpm exec supabase stop --no-backup
