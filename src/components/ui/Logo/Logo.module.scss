@@ -1,0 +1,36 @@
+@use "styles/tokens" as *;
+
+.logo {
+  display: inline-flex;
+  gap: $space-2;
+  align-items: center;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  color: inherit;
+}
+
+// The mark is ~2.5:1, so its height sets the overall size.
+.mark {
+  flex: none;
+  width: auto;
+}
+
+.md {
+  font-size: $font-size-xl;
+
+  .mark {
+    height: 1.5rem;
+  }
+}
+
+.lg {
+  font-size: $font-size-2xl;
+
+  .mark {
+    height: 2rem;
+  }
+}
+
+.wordmark {
+  letter-spacing: -0.01em;
+}

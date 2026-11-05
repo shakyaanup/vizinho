@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/ui/Logo";
 import { DemoLogin } from "@/features/auth/components/DemoLogin";
 import { Link } from "@/i18n/navigation";
 import styles from "./page.module.scss";
@@ -18,7 +19,7 @@ export default async function HomePage() {
   return (
     <>
       <header className={styles.header}>
-        <span className={styles.logo}>Vizinho</span>
+        <Logo className={styles.logo} />
         <nav className={styles.nav}>
           <LocaleSwitcher />
           <Button asChild variant="ghost">

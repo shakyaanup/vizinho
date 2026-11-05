@@ -1,4 +1,5 @@
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/navigation";
 import styles from "./auth-layout.module.scss";
 
@@ -8,7 +9,7 @@ export default function AuthLayout({ children }: LayoutProps<"/[locale]">) {
     <div className={styles.shell}>
       <header className={styles.header}>
         <Link href="/" className={styles.logo}>
-          Vizinho
+          <Logo />
         </Link>
         <LocaleSwitcher />
       </header>

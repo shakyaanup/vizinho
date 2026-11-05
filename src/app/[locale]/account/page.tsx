@@ -5,6 +5,7 @@ import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/ui/Logo";
 import { Spinner } from "@/components/ui/Spinner";
 import { SignOutButton } from "@/features/auth/components/SignOutButton";
 import { Link } from "@/i18n/navigation";
@@ -74,7 +75,7 @@ export default function AccountPage({ searchParams }: PageProps<"/[locale]/accou
   return (
     <>
       <header className={styles.header}>
-        <span className={styles.logo}>Vizinho</span>
+        <Logo className={styles.logo} />
         <LocaleSwitcher />
       </header>
       <main id="main" className={styles.main}>

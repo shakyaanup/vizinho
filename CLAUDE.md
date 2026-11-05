@@ -107,7 +107,8 @@ pnpm db:types            # regenerate src/types/database.ts (after every migrati
 
 ## Conventions
 
-- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, PasswordInput, Spinner, StatCard, Toast. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
+- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Spinner, StatCard, Toast.
+- **Brand:** use `<Logo />` (inline SVG, `currentColor`, follows the theme), never the raw image. Source artwork is `docs/brand/logo.png`. App icons are `src/app/favicon.ico` (16/32/48), `icon.svg` and `apple-icon.png`, generated from the same traced path. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
 
 - **Layout:** routes in `src/app/{customer,host,admin}`. Domain logic in `src/features/<domain>/{actions,queries,schemas}.ts`. Shared UI in `src/components`.
 - **Server first:** default to Server Components. Add `"use client"` only for interactivity. Mutations are Server Actions that zod-validate input and then call an RPC.

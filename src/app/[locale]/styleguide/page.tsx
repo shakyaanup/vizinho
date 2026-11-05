@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/ui/Logo";
 import { StyleguideDemo } from "./styleguide-demo";
 import styles from "./styleguide.module.scss";
 
@@ -33,6 +34,15 @@ export default function StyleguidePage() {
           Tokens, themes and the base component kit. Toggle the theme to check contrast.
         </p>
       </header>
+
+      <section aria-labelledby="logo-heading" className={styles.section}>
+        <h2 id="logo-heading">Logo</h2>
+        <div className={styles.grid}>
+          <Logo size="lg" />
+          <Logo />
+          <Logo withWordmark={false} />
+        </div>
+      </section>
 
       <section aria-labelledby="colors-heading" className={styles.section}>
         <h2 id="colors-heading">Color roles</h2>

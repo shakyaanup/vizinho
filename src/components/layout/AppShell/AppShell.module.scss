@@ -34,9 +34,8 @@ $tabbar-height: 4.25rem;
 
 .logo,
 .topbarLogo {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-bold;
-  color: var(--color-primary);
+  display: inline-flex;
+  color: var(--color-text);
   text-decoration: none;
   border-radius: $radius-sm;
 

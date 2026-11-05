@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense, type ReactNode } from "react";
+import { Logo } from "@/components/ui/Logo";
 import { Spinner } from "@/components/ui/Spinner";
 import { Link } from "@/i18n/navigation";
 import type { AppRole } from "@/lib/auth/roles";
@@ -26,7 +27,7 @@ export async function AppShell({ area, children }: AppShellProps) {
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <Link href={`/${area}`} className={styles.logo}>
-          Vizinho
+          <Logo />
         </Link>
         <span className={styles.areaBadge}>{t(`areas.${area}`)}</span>
         <nav aria-label={t("mainNavigation")}>
@@ -37,7 +38,7 @@ export async function AppShell({ area, children }: AppShellProps) {
       <div className={styles.column}>
         <header className={styles.topbar}>
           <Link href={`/${area}`} className={styles.topbarLogo}>
-            Vizinho
+            <Logo />
           </Link>
           <span className={styles.topbarArea}>{t(`areas.${area}`)}</span>
           <Suspense

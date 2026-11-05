@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/brand/logo.png" alt="Vizinho logo" width="320"></p>
+
 # Vizinho
 
 [![CI](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml/badge.svg)](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml)
