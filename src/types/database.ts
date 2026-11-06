@@ -859,6 +859,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      admin_review_host: {
+        Args: {
+          p_decision: Database["public"]["Enums"]["host_review_decision"];
+          p_host_id: string;
+          p_note?: string;
+        };
+        Returns: Database["public"]["Enums"]["host_status"];
+      };
       admin_set_role: {
         Args: {
           enabled: boolean;
@@ -868,6 +876,7 @@ export type Database = {
         Returns: undefined;
       };
       custom_access_token_hook: { Args: { event: Json }; Returns: Json };
+      submit_host_application: { Args: { p_agreement_version: string }; Returns: string };
     };
     Enums: {
       actor_role: "customer" | "host" | "admin" | "system";
@@ -888,6 +897,7 @@ export type Database = {
         | "incident_opened"
         | "incident_resolved"
         | "admin_override";
+      host_review_decision: "approve" | "reject" | "suspend" | "reinstate";
       host_status: "draft" | "pending_review" | "approved" | "rejected" | "suspended";
       host_type: "individual" | "business";
       incident_status: "open" | "investigating" | "resolved" | "dismissed";
@@ -1049,6 +1059,7 @@ export const Constants = {
         "incident_resolved",
         "admin_override",
       ],
+      host_review_decision: ["approve", "reject", "suspend", "reinstate"],
       host_status: ["draft", "pending_review", "approved", "rejected", "suspended"],
       host_type: ["individual", "business"],
       incident_status: ["open", "investigating", "resolved", "dismissed"],

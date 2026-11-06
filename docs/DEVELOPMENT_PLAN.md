@@ -296,6 +296,14 @@ Each phase ends with a demo, green CI, and an update to this plan.
 
 Host application (rules, caps, hours, time off, pause; address picked on a map), admin approval queue, location snapping, `public_hosts` view, audit logging of admin actions.
 
+Location snapping already exists (Phase 1 trigger), and the `public_hosts` view was dropped in favour of RLS (§7). Steps:
+
+1. **Database** ✅: `submit_host_application(agreement_version)` (draft/rejected → pending_review; checks the area, address and hours exist; records the host agreement; audits; notifies admins) and `admin_review_host(host_id, decision, note)` (approve/reject/suspend/reinstate with fixed source states; a note is required to reject or suspend; approval grants the `host` role and suspension keeps it; admins can't review their own listing; audits; notifies the host). Pausing stays a plain owner-writable column.
+2. **"Become a host" form** in the customer area: type and name, rules and limits, opening hours, agreement.
+3. **Location picker:** MapLibre + OpenFreeMap with Photon search and a draggable pin, plus a preview of the snapped public area. Phase 3's discovery map reuses it.
+4. **Admin approval queue:** pending list, detail (including the private address), approve/reject with a note.
+5. **Host settings:** edit the listing, hours, time off and pause; e2e tests; docs.
+
 ### Phase 3: Discovery and reservations
 
 Uber-style map discovery (geolocation, address search, approximate host markers, bottom-sheet details) with an accessible list-view alternative, host detail page, reservation request with attestation, host accept/decline, address reveal + copy instructions, cancellation, expiry jobs, realtime in-app notifications.

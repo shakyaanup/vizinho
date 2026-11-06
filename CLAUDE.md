@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-**Phase 1 complete** (scaffold, design system, database, auth, role-based app shells, mock data, e2e suite, CI). **Next: Phase 2, host onboarding and admin approval**, after the owner's review. Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): Step 1 done (`submit_host_application` and `admin_review_host` RPCs). **Next: Step 2, the "Become a host" form.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
