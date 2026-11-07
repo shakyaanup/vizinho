@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 // Baseline security headers for every route. A Content-Security-Policy is
-// added in Phase 6, once every external origin (map tiles, Supabase) is known.
+// added in Phase 6, once every external origin (map tiles, geocoder) is known.
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },

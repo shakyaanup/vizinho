@@ -1,0 +1,56 @@
+@use "styles/tokens" as *;
+
+.wrapper {
+  position: relative;
+  display: block;
+}
+
+.select {
+  width: 100%;
+  min-height: $control-height-md;
+  padding: 0 ($space-3 + 1.5rem) 0 $space-3;
+  font-size: $font-size-base; // >= 16px stops iOS Safari zooming on focus
+  color: var(--color-text);
+  appearance: none;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: $border-width solid var(--color-border-strong);
+  border-radius: $radius-md;
+  transition:
+    border-color $duration-fast $ease-out,
+    box-shadow $duration-fast $ease-out;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-text-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow:
+      0 0 0 3px var(--color-primary-subtle),
+      0 0 0 1px var(--color-primary);
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--color-danger);
+    border-width: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--color-surface-sunken);
+    opacity: 0.7;
+  }
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: $space-3;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}

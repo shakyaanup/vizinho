@@ -1,16 +1,9 @@
-import { homePathForRoles, parseRoles } from "./roles";
+import { homePathForRoles, isAppRole } from "./roles";
 
-describe("parseRoles", () => {
-  it("keeps known roles from the JWT claim", () => {
-    expect(parseRoles(["customer", "host"])).toEqual(["customer", "host"]);
-  });
-
-  it("drops unknown or malformed values", () => {
-    expect(parseRoles(["customer", "superuser", 7, null])).toEqual(["customer"]);
-  });
-
-  it.each([undefined, null, "admin", { role: "admin" }])("returns [] for %p", (claim) => {
-    expect(parseRoles(claim)).toEqual([]);
+describe("isAppRole", () => {
+  it("accepts known roles only", () => {
+    expect(isAppRole("host")).toBe(true);
+    expect(["superuser", 7, null, undefined].some(isAppRole)).toBe(false);
   });
 });
 

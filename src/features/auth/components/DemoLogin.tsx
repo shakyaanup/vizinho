@@ -1,13 +1,14 @@
 "use client";
 
 import { Package, ShieldCheck, Store } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useActionState, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import type { AppRole } from "@/lib/auth/roles";
 import { demoLogIn } from "../actions";
 import { idleState } from "../form-state";
+import { useRedirectOnSuccess } from "../use-redirect-on-success";
 import styles from "./DemoLogin.module.scss";
 
 const options = [
@@ -19,14 +20,13 @@ const options = [
 export function DemoLogin() {
   const t = useTranslations("Home.demo");
   const tErrors = useTranslations("Auth.errors");
-  const locale = useLocale();
   const [state, formAction, pending] = useActionState(demoLogIn, idleState);
   // Which button was pressed, so only that one shows a spinner.
   const [chosen, setChosen] = useState<AppRole | null>(null);
+  useRedirectOnSuccess(state);
 
   return (
     <form action={formAction} className={styles.form}>
-      <input type="hidden" name="locale" value={locale} />
       {state.status === "error" && state.formError && (
         <Alert variant="error" title={tErrors(state.formError)} />
       )}
@@ -40,7 +40,7 @@ export function DemoLogin() {
               variant="secondary"
               fullWidth
               className={styles.option}
-              loading={pending && chosen === role}
+              loading={(pending || state.status === "success") && chosen === role}
               disabled={pending}
               onClick={() => setChosen(role)}
             >

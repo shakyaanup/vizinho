@@ -144,8 +144,8 @@ test.describe("admin area (desktop)", () => {
   test("overview counts come from the database", async ({ page }) => {
     await expect(heading(page)).toHaveText("Overview");
     const values = await stats(page);
-    // Accounts grow as the sign-up test runs, so only a lower bound.
-    expect(Number(values["Accounts"])).toBeGreaterThanOrEqual(26);
+    // Each test's browser starts from the seed: 3 demo + 20 hosts + 3 customers.
+    expect(values["Accounts"]).toBe("26");
     expect(values["Approved hosts"]).toBe("18");
     expect(values["Hosts awaiting review"]).toBe("2");
     expect(values["Active reservations"]).toBe("5");

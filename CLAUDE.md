@@ -3,43 +3,42 @@
 Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) receive parcels for customers, who collect them with a short-lived code. Roles: **customer, host, admin**.
 
 - Spec: `docs/VIZINHO_PROJECT_BRIEF.md`
-- Plan, schema, state machine, phases: `docs/DEVELOPMENT_PLAN.md`
-- Architecture decisions: `docs/adr/`
+- Plan, state machine, phases: `docs/DEVELOPMENT_PLAN.md`
+- Architecture decisions: `docs/adr/` (**ADR 0003: frontend-only with mock data** is the current architecture)
 
 ## Context
 
-**Portfolio project**, public on GitHub for employers. There are no real users, but build it like a real production app. There's no OTP, SMS, or ID/document verification: auth is email + password, and host "verification" is admin approval. One-click demo logins exist for reviewers. See `docs/DEVELOPMENT_PLAN.md` §0 for all decisions.
+**Portfolio project**, public on GitHub for employers. **Frontend only** (since 2026-11-07, ADR 0003): no server, no database, no Docker. All data is mock data in the browser (`localStorage`). There's no email, OTP, SMS or ID verification: auth is a mock email + password against accounts in the store, and host "verification" is admin approval. One-click demo logins exist for reviewers. Build it like a real production app otherwise.
 
 ## Current status
 
-**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): Step 1 done (`submit_host_application` and `admin_review_host` RPCs). **Next: Step 2, the "Become a host" form.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Step 2 (the "Become a host" form) is built. **Next: Step 3, the location picker (MapLibre).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
 1. **No tutorial files.** Don't create a `docs/tutorials/` folder.
-2. **Explain every step in chat.** After each development step, explain the logic (what was built, why, how the pieces connect) **and the key code written**: the important functions, SQL, and patterns, with short excerpts where they help. It doesn't need to be line by line.
+2. **Explain every step in chat.** After each development step, explain the logic (what was built, why, how the pieces connect) **and the key code written**: the important functions and patterns, with short excerpts where they help. It doesn't need to be line by line.
+3. **The owner's laptop is low-powered.** Don't introduce Docker, databases or other heavy local services. Keep test runs reasonable.
 
 ## Non-negotiable rules
 
-1. **No carrier/merchant integrations.** Never invent APIs or tracking for Amazon, CTT, DHL, DPD, etc. Parcel status comes only from host, customer, or admin actions. Never claim in UI copy that a merchant or carrier will accept a host address.
-2. **Use mock data** (`supabase/seed.sql`) until the legal and delivery assumptions are validated.
-3. **The secret key (`SUPABASE_SECRET_KEY`, bypasses RLS) never reaches the client.** It's only used in `src/lib/supabase/admin.ts` (imports `server-only`), and only for admin/job code.
-4. **RLS on every table**, with no exceptions. A new table without policies + pgTAP tests is incomplete.
-5. **State transitions go through Postgres RPC functions** (`SECURITY DEFINER`, `set search_path = ''`, check `auth.uid()`, role, and current state). Clients have no direct UPDATE on `reservations`, `parcels`, or `pickup_tokens`. Each transition writes exactly one `custody_events` row in the same transaction.
-6. **`custody_events`, `audit_logs`, and `ledger_entries` are append-only.** Fix mistakes with new rows, never with an UPDATE/DELETE.
-7. **Host privacy:** exact address and coordinates live only in `host_private_details`. Customers get the address only via `get_reservation_address()` after acceptance, and every view is logged. Public coordinates are pre-snapped. Never send exact coordinates or exact distances to the client.
-8. **Secrets:** pickup tokens/PINs are hashed, expiring, single-use, and attempt-limited. Plaintext is returned once and never logged.
-9. **Roles live in `user_roles`**, never in `user_metadata`. Use `has_role()` in SQL and `requireRole()` in server code. Re-check in the DB for sensitive actions, since JWT claims can be stale.
-10. **Data minimization (GDPR):** no ID document storage, no IBAN, and no label PII beyond what matching needs. Sentry/analytics must not receive PII. Data stays in EU regions.
-11. **Public repo: no secrets committed.** Only `.env.example` is committed. The map stack is deliberately key-free.
+1. **No backend.** Don't add a server, database, API routes or external services that need keys. Data lives in `src/mocks/` and the browser store.
+2. **No carrier/merchant integrations.** Never invent APIs or tracking for Amazon, CTT, DHL, DPD, etc. Parcel status comes only from host, customer, or admin actions. Never claim in UI copy that a merchant or carrier will accept a host address.
+3. **Business rules live in services** (`src/features/<domain>/service.ts`): pure functions over `DemoDb` that throw `DomainError(code)` when a rule is broken. They mirror the original Postgres RPCs (ADR 0001): check the actor and their roles **from the store** (not from props), check the current state, and write audit logs / custody events / notifications in the same call. Components never mutate the store directly; actions call services through `transact()`.
+4. **State transitions follow the state machine** in the plan. Each reservation/parcel transition writes exactly one custody event. `custodyEvents`, `auditLogs` and `ledger` are append-only: fix mistakes with new entries.
+5. **Host privacy:** exact addresses and coordinates live only in `hostPrivateDetails`. Customers see `publicLocation` (snapped by `snapToGrid`), never exact coordinates or exact distances.
+6. **Secrets stay hashed:** passwords are stored as salted SHA-256 (`features/auth/password.ts`), pickup codes will be stored hashed. Never store or log plaintext.
+7. **Roles live on `User.roles`**, never chosen by the user (sign-up always creates a customer). Re-check roles in services.
+8. **Data minimization (GDPR mindset):** no ID documents, no IBAN, no label PII beyond what matching needs.
+9. **Be honest about the demo:** UI copy and docs say data is mock and stays in the browser. Don't present the mock auth as real security.
 
 ## Stack
 
-Next.js (App Router) · TypeScript strict · **SCSS Modules (no Tailwind)** · Radix UI primitives · MapLibre GL + OpenFreeMap + Photon geocoding · Supabase (Auth, Postgres + PostGIS, Storage, Realtime, pg_cron) · `@supabase/ssr` · zod · next-intl (en default, pt-PT) · Vitest · pgTAP · Playwright · pnpm.
+Next.js 16.4 (App Router) · TypeScript strict · **SCSS Modules (no Tailwind)** · Radix UI primitives · MapLibre GL + OpenFreeMap + Photon geocoding (planned, key-free) · zod · next-intl (en default, pt-PT) · Vitest · Playwright · pnpm.
 
 ## Commands
 
-Requires Node 24 (`.node-version`), pnpm via corepack, and Docker (OrbStack) for Supabase.
+Requires Node 24 (`.node-version`) and pnpm via corepack. Nothing else.
 
 ```
 pnpm dev                 # Next.js dev server (http://localhost:3000)
@@ -49,82 +48,56 @@ pnpm typecheck           # next typegen + tsc (typegen creates global types like
 pnpm lint | lint:styles  # ESLint | Stylelint (SCSS)
 pnpm format              # Prettier write
 pnpm test | test:watch   # Vitest
-pnpm test:e2e             # Playwright: builds, serves on :3100, runs tests/e2e (needs db:start + a seeded DB)
+pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 ```
 
-Database (Docker must be running):
+**E2E (`tests/e2e`):** import `test`/`expect` from `./fixtures`, not `@playwright/test`. The fixture fails any test that logs a browser console error (use `consoleErrors.allow(/…/)` for an expected one). Use `visible()` locators, `demoLogin()`, and `signUp()` for flows that change data. Every test gets a fresh browser context, so it starts from the seed and may assert on seed counts (update them when the seed changes). The default viewport is a phone (390×844).
 
-```
-pnpm db:start | db:stop  # local Supabase (Studio http://127.0.0.1:54323, Mailpit http://127.0.0.1:54324)
-pnpm db:status           # URLs and local keys (copy into .env.local)
-pnpm db:reset            # rebuild from migrations + seed.sql
-pnpm db:test             # pgTAP tests in supabase/tests/database
-pnpm db:lint             # plpgsql_check on public + private schemas
-pnpm db:types            # regenerate src/types/database.ts (after every migration)
-```
-
-**E2E (`tests/e2e`):** import `test`/`expect` from `./fixtures`, not `@playwright/test`. The fixture fails any test that logs a browser console error (use `consoleErrors.allow(/…/)` for an expected one). Use `visible()` locators, `demoLogin()`, and `uniqueEmail()` for sign-ups so the suite can re-run without a reset. Tests may assert on seed counts; update them when the seed changes. The default viewport is a phone (390×844).
-
-**CI (`.github/workflows/ci.yml`):** `checks` (pnpm check) and `app` (local Supabase → pgTAP, db lint, generated-types drift, build, Playwright) on every push to main and every PR. It uses no repository secrets.
+**CI (`.github/workflows/ci.yml`):** `checks` (pnpm check) and `e2e` (build + Playwright) on every push to main and every PR. No services or secrets.
 
 ## Next.js 16.4 specifics (differs from older versions)
 
 - Read `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
-- **`middleware.ts` is now `src/proxy.ts`** (export `proxy`, Node runtime). Use it only for session refresh and optimistic redirects, never as the real authorization check.
-- **`cacheComponents` is on:** reading `cookies()`/the session must happen inside a `<Suspense>` boundary, not as a top-level `await` in a layout. Request APIs (`cookies`, `headers`, `params`) are async.
+- **`middleware.ts` is now `src/proxy.ts`** (export `proxy`). Here it only does next-intl locale routing.
+- **`cacheComponents` is on:** request APIs (`cookies`, `headers`, `params`, `searchParams`) are async and must be read inside `<Suspense>`.
 - `next lint` no longer exists. Use `pnpm lint`.
-- Code that checks the session must `await connection()` first (done in `getCurrentUser`), or prefetching flags `Date.now()` as non-deterministic.
-- Don't read `?query` params with `useSearchParams()` in forms on static pages, because React then skips server-rendering them. Read `searchParams` in the page (inside `<Suspense>`) and pass props down.
+- Don't read `?query` params with `useSearchParams()` in forms on static pages, because React then skips server-rendering them. Read `searchParams` in the page (inside `<Suspense>`) and pass props down (see the login page).
 
-## Auth & i18n patterns
+## Data, session & i18n patterns
 
-- **Who is the user:** `getCurrentUser()` / `requireUser(returnTo)` / `requireRole(role, returnTo)` from `@/lib/auth/session` (uses `getClaims()`, never `getSession()`). Call them inside a `<Suspense>` boundary.
-- **Supabase clients:** `@/lib/supabase/server` (per request, RLS applies), `@/lib/supabase/browser` (client components), `@/lib/supabase/admin` (secret key, bypasses RLS, trusted jobs only).
-- **Proxy (`src/proxy.ts`):** refreshes the session, then runs next-intl routing, then copies cookies and no-cache headers. Signed-out visitors on `PROTECTED_PREFIXES` get an optimistic redirect to `/login?next=`. Add new protected areas there **and** guard the page.
-- **Locale:** URL segment `[locale]` (`/` = en, `/pt` = pt-PT; ADR 0002). Always use `Link`/`redirect`/`getPathname` from `@/i18n/navigation`. Server Actions get the locale from a hidden `locale` field and return translation keys (`FormState`), never raw error text.
+- **Mock data:** domain types in `src/mocks/types.ts`, the seed in `src/mocks/seed.ts` (fixed id prefixes: demo users `11111111-`/`22222222-`/`33333333-`, Hugo's listing `44444444-`, host owners `aaaaaaaa-`, host listings `bbbbbbbb-`, customers `cccccccc-`, reservations `dddddddd-`, parcels `eeeeeeee-`; times relative to `now`). Seeded history must stay consistent with the state machine (`seed.test.ts` checks it).
+- **Store (`src/mocks/store.ts`):** `useDemoState()` (null during SSR and hydration: render a loading state), `transact(recipe)` for every change (edits a copy, saves only if the recipe doesn't throw), `resetDemoData()`. Derive data with selectors (`src/features/<domain>/selectors.ts`) inside `useMemo`.
+- **Who is the user:** `useSession()` / `useCurrentUser()` (inside `RoleGate` only) / `signIn()` / `signOut()` from `@/lib/auth/session`. Selectors and services take the user id from the session, never from URLs or form fields.
+- **Guards:** `RoleGate` (client) in each area's shell; `useSignedOutRedirect()` sends visitors who arrive signed out to `/login?next=` and users who sign out to home.
+- **Form actions** (`src/features/<domain>/actions.ts`, run in the browser) work with `useActionState`: zod-validate, run the service via `transact()`, return `FormState` with translation keys (`@/lib/forms/form-state`), never raw error text. Auth actions return `redirectTo`; forms navigate with `useRedirectOnSuccess`.
+- **React 19 form reset:** `<form action>` forms are reset after every submit. For edit forms with a `<select>` or state-driven fields, dispatch from `onSubmit` + `startTransition` instead (see `ListingForm`).
+- **Locale:** URL segment `[locale]` (`/` = en, `/pt` = pt-PT; ADR 0002). Always use `Link`/`redirect`/`useRouter` from `@/i18n/navigation`. Forms that need the locale post a hidden `locale` field (`readLocale`).
 - **Redirect targets** from user input go through `safeRedirectPath()` (open-redirect guard).
-- **Demo accounts** (seeded, password `VizinhoDemo2026`): `customer@`, `host@`, `admin@demo.vizinho.app`.
-- Auth emails use `supabase/templates/*.html` (bilingual, `token_hash` links to `/[locale]/auth/confirm`). Locally they land in Mailpit.
+- **Demo accounts** (password `VizinhoDemo2026`): `customer@`, `host@`, `admin@demo.vizinho.app`.
 
 ## App shell & areas
 
-- `/customer`, `/host`, `/admin` each use `<AppShell area="…">` in their `layout.tsx`. The shell (nav, top bar) is static; the user menu and page stream behind `<Suspense>`, and the page renders inside `RoleGate` (`requireRole`).
-- Guards are layered: the proxy redirects by JWT roles (fast path) → `RoleGate` (authoritative) → data loaders call `requireRole` themselves → RLS.
+- `/customer`, `/host`, `/admin` each use `<AppShell area="…">` in their `layout.tsx`. The shell (nav, top bar) is a static server component; the user menu and the page (inside `RoleGate`) are client-side.
+- Page files stay thin server components (metadata via `getTranslations`) that render a client component from `src/features/<domain>/components/`.
 - **Nav items** are defined once in `src/components/layout/AppShell/nav-config.ts` (max 5 per area, for the phone tab bar). Unbuilt sections render `<ComingSoon area section phase />`.
-- **Data loaders** (`src/features/<domain>/queries.ts`) resolve the current user themselves. Never accept a user id from the caller.
-- After login, Server Actions redirect straight to the user's area (`homePathForRoles`). `/dashboard` is only for direct visits, because chaining redirects during a client transition leaves the wrong URL in the address bar.
 - **Theme:** `useTheme()` (`src/lib/theme`), stored in localStorage and applied pre-paint by `themeInitScript` in `<head>`. `<html>`/`<body>` have `suppressHydrationWarning` for that script and for browser extensions.
 - Radix `asChild` needs exactly **one** child element. `DropdownMenuRadioItem` forbids `asChild`; for links in menus use `DropdownMenuItem asChild`.
 
-## Database conventions
-
-- **Deny by default:** the foundation migration removes Supabase's automatic grants. Every new table needs explicit `grant`s (column-level for writable columns) **and** RLS policies. Every new function is non-executable until granted.
-- Helpers used by policies/RPCs live in the `private` schema (not exposed by the API). `SECURITY DEFINER` functions always `set search_path = ''` and fully qualify names (`public.x`, `extensions.st_*`).
-- Wrap `auth.uid()`/helpers in policies as `(select …)` so Postgres evaluates them once per query, not per row.
-- **Seed (`supabase/seed.sql`)** is mock data only, with fixed id prefixes: demo users `11111111-`/`22222222-`/`33333333-`, Hugo's host `44444444-`, mock owners `aaaaaaaa-`, mock hosts `bbbbbbbb-`, customers `cccccccc-`, reservations `dddddddd-`, parcels `eeeeeeee-`. Times are relative to `now()`. Seeded history must stay consistent with the state machine (`06_seed_integrity.test.sql` checks it). Only the three demo accounts have a known password.
-- `01_security_baseline.test.sql` is the guard test (RLS on every table, no anon grants, no client writes on state tables, pinned search paths). Update its table list when adding a table.
-- pgTAP helpers: `supabase/tests/database/_helpers.psql` (`tests.create_user`, `tests.authenticate_as`, `tests.create_approved_host`, …). Switch back with `reset role;`.
-
 ## Conventions
 
-- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Spinner, StatCard, Toast.
-- **Brand:** use `<Logo />` (inline SVG, `currentColor`, follows the theme), never the raw image. Source artwork is `docs/brand/logo.png`. App icons are `src/app/favicon.ico` (16/32/48), `icon.svg` and `apple-icon.png`, generated from the same traced path. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
-
-- **Layout:** routes in `src/app/{customer,host,admin}`. Domain logic in `src/features/<domain>/{actions,queries,schemas}.ts`. Shared UI in `src/components`.
-- **Server first:** default to Server Components. Add `"use client"` only for interactivity. Mutations are Server Actions that zod-validate input and then call an RPC.
-- **Migrations:** new timestamped file per change via `supabase migration new`. Never edit a merged migration. Regenerate types after every schema change.
-- **Money:** integer cents, EUR. **Time:** `timestamptz`, displayed in `Europe/Lisbon`.
+- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Select, Spinner, StatCard, Toast. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
+- **Brand:** use `<Logo />` (inline SVG, `currentColor`, follows the theme), never the raw image. Source artwork is `docs/brand/logo.png`. App icons are `src/app/favicon.ico` (16/32/48), `icon.svg` and `apple-icon.png`, generated from the same traced path.
+- **Layout:** routes in `src/app/[locale]/{customer,host,admin}`. Domain logic in `src/features/<domain>/{service,selectors,actions,schemas}.ts` + `components/`. Shared UI in `src/components`.
+- **Money:** integer cents, EUR. **Time:** ISO strings in UTC, displayed in `Europe/Lisbon`.
 - **Styling:** never Tailwind. Each component is a folder: `Component.tsx` + `Component.module.scss` + `index.ts`. Use tokens from `src/styles/` (`@use "styles/tokens" as *;`, resolved via `sassOptions.loadPaths`), not raw hex/px values. Stylelint forbids hex colors outside the token/theme files. Class names are camelCase. Theme colors are CSS custom properties so light/dark switching works. Write mobile-first media queries via the `respond-to()` mixin.
 - **i18n:** no hard-coded user-facing strings. Add keys to both `src/messages/en.json` and `src/messages/pt-PT.json` (European Portuguese). A unit test fails if the key sets or `{placeholders}` differ.
 - **Accessibility:** WCAG 2.2 AA, semantic HTML, labelled inputs, visible focus, 44px touch targets, no color-only status. Mobile-first: design at 360px width first.
-- **Errors:** server actions return typed `{ ok: true, data } | { ok: false, error }` results. Never leak DB errors or PII to the client.
-- **Naming:** `snake_case` in SQL, `camelCase` in TS. Component folders/files use `PascalCase` (`Button/Button.tsx`), and all other files use `kebab-case`.
-- **Tests:** unit tests sit next to the code as `*.test.ts(x)`.
+- **Naming:** `camelCase` in TS. Component folders/files use `PascalCase` (`Button/Button.tsx`), and all other files use `kebab-case`.
+- **Tests:** unit tests sit next to the code as `*.test.ts(x)`. Every service rule gets allowed **and** refused cases.
 
 ## Definition of done (per change)
 
-- Typecheck, lint, unit, pgTAP, and e2e (where relevant) all pass.
-- New tables/RPCs have pgTAP tests covering **allowed and denied** access for each role.
-- No new PII collected without a note in the plan/ADR.
+- Typecheck, lint, unit and e2e (where relevant) all pass.
+- New service rules have unit tests for allowed and refused paths.
 - Logic and key code explained to the owner in chat.
 - Docs updated (plan, ADR, or this file) when a decision changes.

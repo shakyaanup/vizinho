@@ -2,9 +2,6 @@ import { test as base, expect, type Locator, type Page } from "@playwright/test"
 
 export { expect };
 
-/** Local Mailpit (catches every email Supabase Auth sends). */
-const MAILPIT_API = "http://127.0.0.1:54324/api/v1";
-
 /**
  * `test` with one extra, automatic check: any browser console error or
  * uncaught exception on the page fails the test. Hydration mismatches and
@@ -36,7 +33,7 @@ export const visible = (locator: Locator) => locator.filter({ visible: true });
 
 export const heading = (page: Page) => visible(page.getByRole("heading", { level: 1 }));
 
-/** A fresh, unique address per run so the suite can be re-run without a reset. */
+/** A unique address, so sign-ups never collide. */
 export const uniqueEmail = (name: string) =>
   `${name}+${Date.now()}${Math.floor(Math.random() * 1000)}@example.com`;
 
@@ -58,32 +55,17 @@ export const mainNav = (page: Page) =>
   visible(page.locator("nav[aria-label='Main navigation']"));
 
 /**
- * Waits for an auth email and returns its action link, pointed at the app
- * under test (emails use the configured site URL, :3000).
+ * Signs up a brand-new customer (signed in straight away in the demo).
+ * Each test's browser context starts with a fresh copy of the mock data.
  */
-export async function emailLink(
-  page: Page,
-  to: string,
-  type: "email" | "recovery",
-): Promise<{ link: string; html: string }> {
-  const pattern = new RegExp(`href="([^"]*type=${type}[^"]*)"`);
-  for (let attempt = 0; attempt < 40; attempt++) {
-    const search = await fetch(
-      `${MAILPIT_API}/search?query=${encodeURIComponent(`to:"${to}"`)}`,
-    );
-    const { messages = [] } = (await search.json()) as { messages?: { ID: string }[] };
-    for (const { ID } of messages) {
-      const message = (await (await fetch(`${MAILPIT_API}/message/${ID}`)).json()) as {
-        HTML: string;
-      };
-      const href = message.HTML.match(pattern)?.[1];
-      if (href) {
-        const url = new URL(href.replaceAll("&amp;", "&"));
-        const target = new URL(url.pathname + url.search, page.url());
-        return { link: target.toString(), html: message.HTML };
-      }
-    }
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
-  throw new Error(`No "${type}" email arrived for ${to}`);
+export async function signUp(page: Page, fullName: string) {
+  const email = uniqueEmail(fullName.split(" ")[0]!.toLowerCase());
+  await page.goto("/signup");
+  await visible(page.getByLabel("Full name")).fill(fullName);
+  await visible(page.getByLabel("Email")).fill(email);
+  await visible(page.getByLabel("Password", { exact: true })).fill("Lisboa2026");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Create account" }).click();
+  await page.waitForURL("/customer");
+  return email;
 }

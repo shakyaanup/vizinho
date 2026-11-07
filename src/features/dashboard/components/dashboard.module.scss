@@ -1,0 +1,57 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.stack {
+  display: grid;
+  gap: $space-5;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: $space-3;
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-3;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-4;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: $font-size-lg;
+}
+
+.badges {
+  display: flex;
+  gap: $space-2;
+}
+
+.muted {
+  margin: $space-2 0 0;
+  color: var(--color-text-muted);
+}
+
+.cardAction {
+  margin-top: $space-4;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: $space-3 $space-6;
+  margin: 0;
+
+  dt {
+    font-weight: $font-weight-semibold;
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+  }
+}

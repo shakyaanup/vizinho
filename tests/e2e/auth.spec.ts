@@ -1,8 +1,8 @@
 import {
   demoLogin,
-  emailLink,
   expect,
   heading,
+  signUp,
   test,
   uniqueEmail,
   visible,
@@ -73,9 +73,7 @@ test.describe("log in", () => {
     });
   }
 
-  test("the login form is server-rendered (works without JavaScript)", async ({
-    browser,
-  }) => {
+  test("the login form is server-rendered", async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto("/login?next=%2Faccount");
@@ -104,70 +102,44 @@ test.describe("sign up", () => {
     await expect(visible(page.getByText("Use pelo menos 8 caracteres."))).toBeVisible();
     await expect(visible(page.getByLabel("Nome completo"))).toHaveValue("Rita Sousa");
     await expect(page.getByRole("checkbox")).toBeChecked();
-    // Passwords are never echoed back from the server.
+    // Passwords are never echoed back into the form.
     await expect(visible(page.getByLabel("Palavra-passe", { exact: true }))).toHaveValue(
       "",
     );
   });
 
-  test("sign up → confirm by email → reset password → log in", async ({ page }) => {
-    const email = uniqueEmail("rita");
-
-    await page.goto("/pt/signup");
-    await visible(page.getByLabel("Nome completo")).fill("Rita Sousa");
-    await visible(page.getByLabel("Email")).fill(email);
-    await visible(page.getByLabel("Palavra-passe", { exact: true })).fill("Lisboa2026");
-    await page.getByRole("checkbox").check();
-    await page.getByRole("button", { name: "Criar conta" }).click();
-    await expect(visible(page.getByText("Verifique o seu email"))).toBeVisible();
-
-    // Unconfirmed accounts cannot log in yet.
-    await page.goto("/pt/login");
-    await visible(page.getByLabel("Email")).fill(email);
-    await visible(page.getByLabel("Palavra-passe", { exact: true })).fill("Lisboa2026");
-    await page.getByRole("button", { name: "Entrar" }).click();
-    await expect(visible(page.getByText(/Confirme primeiro/))).toBeVisible();
-
-    // The confirmation email is in Portuguese and links to /pt/auth/confirm.
-    const confirmation = await emailLink(page, email, "email");
-    expect(confirmation.html).toContain("Confirme o seu email");
-    expect(confirmation.html).toContain("Rita Sousa");
-    expect(new URL(confirmation.link).pathname).toBe("/pt/auth/confirm");
-
-    await page.goto(confirmation.link);
-    await expect(page).toHaveURL(/\/pt\/account\?notice=confirmed/);
-    await expect(heading(page)).toHaveText("Olá, Rita Sousa");
-
-    // Links are single-use.
-    await page.goto(confirmation.link);
-    await expect(
-      visible(page.getByText("Este link é inválido ou expirou")),
-    ).toBeVisible();
-
-    await page.context().clearCookies();
-    await page.goto("/forgot-password");
-    await visible(page.getByLabel("Email")).fill(email);
-    await page.getByRole("button", { name: "Send reset link" }).click();
-    await expect(visible(page.getByText("Check your email"))).toBeVisible();
-
-    const recovery = await emailLink(page, email, "recovery");
-    await page.goto(recovery.link);
-    await expect(page).toHaveURL(/\/reset-password$/);
-    await page.locator('input[name="password"]:visible').fill("Porto2026new");
-    await page.getByRole("button", { name: "Save password" }).click();
-    await expect(page).toHaveURL(/notice=passwordUpdated/);
-    await expect(
-      visible(page.getByText("Your password has been updated.")),
-    ).toBeVisible();
-
-    await page.context().clearCookies();
-    await page.goto("/login");
-    await visible(page.getByLabel("Email")).fill(email);
-    await visible(page.getByLabel("Password", { exact: true })).fill("Porto2026new");
-    await page.getByRole("button", { name: "Log in" }).click();
-    await expect(page).toHaveURL("/customer");
+  test("a new account is signed in, survives a reload, and can log in again", async ({
+    page,
+  }) => {
+    const email = await signUp(page, "Rita Sousa");
     // A brand-new customer has nothing on the way yet.
     await expect(visible(page.getByText("No parcels on the way"))).toBeVisible();
+
+    await page.reload();
+    await expect(heading(page)).toHaveText("Hello, Rita");
+
+    await page.getByRole("button", { name: "Account menu" }).click();
+    await page.getByRole("menuitem", { name: "Log out" }).click();
+    await expect(page).toHaveURL("/");
+
+    // The same email can't register twice.
+    await page.goto("/signup");
+    await visible(page.getByLabel("Full name")).fill("Rita Again");
+    await visible(page.getByLabel("Email")).fill(email);
+    await visible(page.getByLabel("Password", { exact: true })).fill("Lisboa2026");
+    await page.getByRole("checkbox").check();
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(
+      visible(
+        page.getByText("An account with this email already exists. Log in instead."),
+      ),
+    ).toBeVisible();
+
+    await page.goto("/login");
+    await visible(page.getByLabel("Email")).fill(email);
+    await visible(page.getByLabel("Password", { exact: true })).fill("Lisboa2026");
+    await page.getByRole("button", { name: "Log in" }).click();
+    await expect(page).toHaveURL("/customer");
   });
 });
 
@@ -176,4 +148,14 @@ test("the language switcher keeps the current page", async ({ page }) => {
   await page.goto("/account");
   await page.getByRole("link", { name: /Language: Português/ }).click();
   await expect(page).toHaveURL("/pt/account");
+});
+
+test("reset demo data restores the seed", async ({ page }) => {
+  await signUp(page, "Temporary Person");
+  await page.goto("/account");
+  await page.getByRole("button", { name: "Reset demo data" }).click();
+  await expect(visible(page.getByText("Demo data has been reset."))).toBeVisible();
+  // The account created above no longer exists, so its session ends.
+  await page.goto("/customer");
+  await expect(page).toHaveURL(/\/login\?next=%2Fcustomer/);
 });

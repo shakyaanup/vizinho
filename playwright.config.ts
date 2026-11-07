@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // The suite runs against a production build on its own port, so it never
-// collides with `pnpm dev` on :3000. Local Supabase must be running and
-// freshly seeded (`pnpm db:reset`): tests assert on the mock data.
+// collides with `pnpm dev` on :3000. Every test gets a fresh browser context,
+// so it starts from the seed data (src/mocks/seed.ts) and tests can assert on it.
 const PORT = 3100;
 const isCI = Boolean(process.env.CI);
 

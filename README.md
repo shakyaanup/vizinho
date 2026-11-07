@@ -4,65 +4,79 @@
 
 [![CI](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml/badge.svg)](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml)
 
-A Portugal-first, peer-to-peer parcel pickup platform: customers have parcels delivered to a verified neighbor or local shop and collect them with a short-lived pickup code.
+A Portugal-first, peer-to-peer parcel pickup app. Customers have parcels delivered to a verified neighbour or local shop ("host") and collect them later with a one-time pickup code. Hosts earn a small fee per pickup; admins approve hosts and keep an eye on every parcel's chain of custody.
 
-> **Portfolio project.** There are no real users, carriers, or payments. All hosts and parcels are mock data.
+> **Portfolio project, frontend only.** There is no server or database: the app runs entirely in your browser on mock data, saved in `localStorage`. There are no real users, carriers or payments, and no integrations with merchants or carriers.
 
 - Product brief: [`docs/VIZINHO_PROJECT_BRIEF.md`](docs/VIZINHO_PROJECT_BRIEF.md)
-- Architecture, schema and roadmap: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)
+- Roadmap and design: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)
+- Why frontend-only: [ADR 0003](docs/adr/0003-frontend-only-with-mock-data.md)
 
 ## Try it
 
-Open the app and press **Try as customer / host / admin** on the home page, or log in with one of the seeded demo accounts (password `VizinhoDemo2026`):
+Run it locally (below) and press **Try as customer / host / admin** on the home page, or log in with a demo account (password `VizinhoDemo2026`):
 
-| Role     | Email                       |
-| -------- | --------------------------- |
-| Customer | `customer@demo.vizinho.app` |
-| Host     | `host@demo.vizinho.app`     |
-| Admin    | `admin@demo.vizinho.app`    |
+| Role     | Email                       | What to look at                                                      |
+| -------- | --------------------------- | -------------------------------------------------------------------- |
+| Customer | `customer@demo.vizinho.app` | Active reservations, "Become a host" application                     |
+| Host     | `host@demo.vizinho.app`     | Pending request, parcel in storage, listing details, switching areas |
+| Admin    | `admin@demo.vizinho.app`    | Platform overview: hosts awaiting review, open incidents             |
 
-The app is available in English (`/`) and European Portuguese (`/pt`).
+You can also create your own account. Everything you do is saved in your browser only; **Reset demo data** on the account page restores the original data.
 
-### Mock data
+The app is available in English (`/`) and European Portuguese (`/pt`), in light and dark mode.
 
-`supabase/seed.sql` creates a small, believable network so every screen has something to show:
+## Features
 
-- **21 hosts** across Lisbon (Alfama, Baixa, Arroios, Alvalade, Belém, Parque das Nações, …): neighbours and local shops with different opening hours, capacities and size limits. 18 are approved, 2 wait for admin review, and 1 is suspended.
-- **8 reservations** in different states (requested, accepted, waiting for pickup, collected, declined, cancelled), each with its chain-of-custody history, plus one open "damaged parcel" incident and a host earning.
-- Public map pins are snapped to a ~400 m grid; exact addresses stay private.
+- **Three role-based areas** (customer, host, admin) with a phone tab bar and a desktop sidebar. Users with several roles switch areas from the account menu.
+- **Accounts:** sign-up and log-in with validation, one-click demo logins, and safe redirects back to the page you came from.
+- **Become a host:** a multi-step application (listing, opening hours, location, host agreement) with a live checklist. It's locked while an admin reviews it.
+- **Host approval rules:** draft → in review → approved / rejected → suspended / reinstated. Each decision is allowed from one state only, rejections need a reason, admins can't approve their own listing, and every decision is written to an audit log and notifies the other side.
+- **Location privacy:** customers only ever see a host's position snapped to a ~400 m grid; exact addresses stay private.
+- **Bilingual, accessible, mobile-first:** next-intl with typed messages, WCAG 2.2 AA (labelled inputs, visible focus, 44 px touch targets, keyboard-operable menus), designed at 360 px first.
 
-People, shops and addresses are invented. There are no carrier or merchant integrations.
+Coming next (see the roadmap): a map to pick a host's location and find hosts nearby (MapLibre + OpenFreeMap), the admin approval queue, reservations and pickup codes.
 
-## Tech stack
+## Mock data
 
-Next.js 16 (App Router, Cache Components) · TypeScript · SCSS Modules · Radix UI · next-intl · Supabase (Postgres, Auth, RLS) · zod · Vitest · pgTAP · Playwright
+[`src/mocks/seed.ts`](src/mocks/seed.ts) builds a small, believable Lisbon network every time the demo starts or is reset:
+
+- **21 hosts** across Alfama, Baixa, Arroios, Alvalade, Belém, Parque das Nações and more: neighbours and local shops with different opening hours, capacities and size limits. 18 are approved, 2 are waiting for review, 1 is suspended.
+- **8 reservations** in different states (requested, accepted, waiting for pickup, collected, declined, cancelled), each with its chain-of-custody history, plus an open "damaged parcel" incident and a host earning.
+- Times are relative to "now", so the demo always looks current.
+
+People, shops and addresses are invented; coordinates sit on real streets so the map will look plausible.
+
+## How it's built
+
+| Layer      | Choice                                                                                                    |
+| ---------- | --------------------------------------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Cache Components), React 19, TypeScript (strict)                                  |
+| Styling    | SCSS Modules with design tokens and CSS custom-property themes (no Tailwind), Radix UI primitives, Lucide |
+| i18n       | next-intl, locale in the URL (`/` English, `/pt` European Portuguese)                                     |
+| Validation | zod, with errors as translation keys                                                                      |
+| Data       | Typed mock data + a small `localStorage` store with all-or-nothing transactions                           |
+| Tests      | Vitest + Testing Library (unit), Playwright (end-to-end)                                                  |
+
+The code is organised by feature: `src/features/<domain>/` holds each area's **service** (business rules), **schemas** (zod), **actions** (form handlers) and **components**. The services are pure functions over the mock database, written so a real backend could replace the store later without touching the UI.
 
 ## Local setup
 
-Prerequisites: **Node 24**, **pnpm** (`corepack enable`), **Docker** (e.g. OrbStack).
+Prerequisites: **Node 24** and **pnpm** (`corepack enable`). Nothing else: no Docker, no database, no environment variables.
 
 ```bash
 pnpm install
-pnpm db:start       # local Supabase in Docker (first run downloads images)
-cp .env.example .env.local   # then paste the keys printed by `pnpm db:status`
 pnpm dev            # http://localhost:3000
 ```
-
-Local services: Supabase Studio http://127.0.0.1:54323 · email inbox (Mailpit) http://127.0.0.1:54324
 
 ## Quality checks
 
 ```bash
-pnpm check          # typecheck, ESLint, Stylelint, Prettier, unit tests
-pnpm db:test        # 88 pgTAP assertions: RLS, grants, append-only logs, seed integrity
-pnpm test:e2e       # 24 Playwright tests on a production build (port 3100)
+pnpm check          # typecheck, ESLint, Stylelint, Prettier, 90 unit tests
+pnpm test:e2e       # 27 Playwright tests on a production build (port 3100)
 pnpm build
 ```
 
-`pnpm test:e2e` needs local Supabase running with the seed loaded (`pnpm db:reset`). It checks every role's flows on a phone-sized screen and desktop, the sign-up → email confirmation → password reset loop through Mailpit, keyboard use, and it fails on any browser console error.
+The unit tests cover the business rules (the host application state machine, editing locks, the four-eyes rule), the mock data's integrity (snapped pins, consistent custody history, which accounts can sign in) and the store. The end-to-end tests run every role's flows on a phone-sized screen and on desktop, in both languages, and fail on any browser console error.
 
-GitHub Actions runs all of the above on every push and pull request, against a fresh local Supabase stack on the runner (no secrets needed).
-
-## Security model
-
-Authorization is enforced in Postgres, not just in app code: deny-by-default grants, Row Level Security on every table, state changes only through audited RPCs, and append-only custody/audit logs. See [ADR 0001](docs/adr/0001-authorization-in-the-database.md).
+GitHub Actions runs both on every push and pull request.

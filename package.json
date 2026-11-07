@@ -2,7 +2,7 @@
   "name": "vizinho",
   "version": "0.1.0",
   "private": true,
-  "description": "Portugal-first peer-to-peer parcel pickup platform (portfolio project).",
+  "description": "Portugal-first peer-to-peer parcel pickup platform: a frontend-only portfolio project with mock data.",
   "engines": {
     "node": ">=24"
   },
@@ -19,18 +19,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "db:start": "supabase start",
-    "db:stop": "supabase stop",
-    "db:status": "supabase status",
-    "db:reset": "supabase db reset",
-    "db:test": "supabase test db",
-    "db:lint": "supabase db lint --schema public,private --level warning",
-    "db:types": "supabase gen types typescript --local --schema public > src/types/database.ts && prettier --log-level warn --write src/types/database.ts",
     "check": "pnpm typecheck && pnpm lint && pnpm lint:styles && pnpm format:check && pnpm test"
   },
   "dependencies": {
-    "@supabase/ssr": "0.12.7",
-    "@supabase/supabase-js": "2.118.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.66.0",
     "next": "16.4.3",
@@ -38,7 +29,6 @@
     "radix-ui": "1.8.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "server-only": "^0.0.1",
     "zod": "4.6.7"
   },
   "devDependencies": {
@@ -59,7 +49,6 @@
     "stylelint": "^17.16.0",
     "stylelint-config-recess-order": "^7.9.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "supabase": "^2.122.0",
     "typescript": "^5",
     "vitest": "^5.0.5"
   },

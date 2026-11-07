@@ -1,28 +1,23 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
-import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
-import { signOut } from "../actions";
+import { useRouter } from "@/i18n/navigation";
+import { signOut } from "@/lib/auth/session";
 
-function SubmitButton() {
+export function SignOutButton() {
   const t = useTranslations("Auth");
-  const { pending } = useFormStatus();
+  const router = useRouter();
   return (
-    <Button type="submit" variant="secondary" loading={pending}>
+    <Button
+      variant="secondary"
+      onClick={() => {
+        router.replace("/");
+        signOut();
+      }}
+    >
       <LogOut aria-hidden /> {t("signOut")}
     </Button>
-  );
-}
-
-/** A form (not a link) so signing out is a POST: a stray GET can't log you out. */
-export function SignOutButton() {
-  const locale = useLocale();
-  return (
-    <form action={signOut}>
-      <input type="hidden" name="locale" value={locale} />
-      <SubmitButton />
-    </form>
   );
 }

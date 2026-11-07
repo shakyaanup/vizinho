@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
@@ -10,31 +10,26 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Link } from "@/i18n/navigation";
 import { logIn } from "../actions";
 import { idleState } from "../form-state";
+import { useRedirectOnSuccess } from "../use-redirect-on-success";
 import styles from "./auth-form.module.scss";
 
 type LoginFormProps = {
-  /** Where to go after logging in (validated again on the server). */
+  /** Where to go after logging in (validated by safeRedirectPath). */
   next?: string;
-  /** Set when arriving from an expired/used email link. */
-  linkInvalid?: boolean;
 };
 
-export function LoginForm({ next = "", linkInvalid = false }: LoginFormProps) {
+export function LoginForm({ next = "" }: LoginFormProps) {
   const t = useTranslations("Auth");
   const tCommon = useTranslations("Common");
-  const locale = useLocale();
   const [state, formAction, pending] = useActionState(logIn, idleState);
+  useRedirectOnSuccess(state);
 
   const errors = state.status === "error" ? state : undefined;
 
   return (
     <form action={formAction} className={styles.form} noValidate>
-      <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="next" value={next} />
 
-      {linkInvalid && !errors && (
-        <Alert variant="error" title={t("errors.linkInvalid")} />
-      )}
       {errors?.formError && (
         <Alert variant="error" title={t(`errors.${errors.formError}`)} />
       )}
@@ -66,11 +61,12 @@ export function LoginForm({ next = "", linkInvalid = false }: LoginFormProps) {
         />
       </Field>
 
-      <Link href="/forgot-password" className={styles.inlineLink}>
-        {t("login.forgotPassword")}
-      </Link>
-
-      <Button type="submit" size="lg" fullWidth loading={pending}>
+      <Button
+        type="submit"
+        size="lg"
+        fullWidth
+        loading={pending || state.status === "success"}
+      >
         {t("login.submit")}
       </Button>
 

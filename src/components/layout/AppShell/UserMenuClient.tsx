@@ -11,7 +11,6 @@ import {
   UserRound,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useTransition } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import {
   DropdownMenu,
@@ -23,15 +22,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import { signOut } from "@/features/auth/actions";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { APP_ROLES, type AppRole } from "@/lib/auth/roles";
+import { signOut, useSession } from "@/lib/auth/session";
 import { isTheme } from "@/lib/theme/theme";
 import { useTheme } from "@/lib/theme/use-theme";
 import styles from "./AppShell.module.scss";
 
 const LANGUAGE_NAMES: Record<Locale, string> = { en: "English", "pt-PT": "Português" };
+
+type UserMenuProps = { area: AppRole; loadingLabel: string };
+
+/** The signed-in user's menu. A placeholder until the session is read. */
+export function UserMenu({ area, loadingLabel }: UserMenuProps) {
+  const session = useSession();
+  if (session.status !== "signedIn") {
+    return <span className={styles.userSkeleton} aria-label={loadingLabel} />;
+  }
+  const { fullName, email, roles } = session.user;
+  return <UserMenuClient area={area} name={fullName} email={email} roles={roles} />;
+}
 
 type UserMenuClientProps = {
   area: AppRole;
@@ -48,15 +59,13 @@ export function UserMenuClient({ area, name, email, roles }: UserMenuClientProps
   const router = useRouter();
   const pathname = usePathname();
   const [theme, setTheme] = useTheme();
-  const [signingOut, startSignOut] = useTransition();
 
   // Only areas the user can actually enter (from the verified JWT claim).
   const areas = APP_ROLES.filter((role) => roles.includes(role));
 
   function handleSignOut() {
-    const formData = new FormData();
-    formData.set("locale", locale);
-    startSignOut(() => signOut(formData));
+    router.replace("/");
+    signOut();
   }
 
   return (
@@ -137,13 +146,7 @@ export function UserMenuClient({ area, name, email, roles }: UserMenuClientProps
         </DropdownMenuRadioGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          disabled={signingOut}
-          onSelect={(event) => {
-            event.preventDefault(); // keep the menu open while signing out
-            handleSignOut();
-          }}
-        >
+        <DropdownMenuItem onSelect={handleSignOut}>
           <LogOut aria-hidden /> {tAuth("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>

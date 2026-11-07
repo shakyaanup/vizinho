@@ -1,7 +1,9 @@
 # Vizinho — Development Plan (v0.1, for review)
 
-Status: **APPROVED (with the changes in §0). Phase 1 complete (2026-11-05). Next: Phase 2.**
-Source: `docs/VIZINHO_PROJECT_BRIEF.md` (`docs/conversation.md` was referenced but does not exist in the repo).
+Status: **APPROVED (with the changes in §0). Phase 1 complete (2026-11-05). Frontend-only since 2026-11-07. Phase 2 in progress.**
+
+> **Architecture change, 2026-11-07 ([ADR 0003](adr/0003-frontend-only-with-mock-data.md)).** The project is now **frontend-only**: no Supabase, no database, no Docker. Data is mock data in the browser (`src/mocks/`), and the business rules that were Postgres functions and RLS policies are TypeScript services with the same rules. Sections §6–§8 below describe the original backend design; they're kept as the blueprint for a future real backend, and where they mention tables, RLS or RPCs, read "the `DemoDb` collections and services" instead.
+> Source: `docs/VIZINHO_PROJECT_BRIEF.md` (`docs/conversation.md` was referenced but does not exist in the repo).
 
 ---
 
@@ -24,6 +26,7 @@ Source: `docs/VIZINHO_PROJECT_BRIEF.md` (`docs/conversation.md` was referenced b
 | Pilot area           | Seed data covers several Lisbon neighborhoods (Arroios, Alvalade, Campo de Ourique, Graça).                                                                                                                                                                                                                                                                                                 |
 | Defaults M1–M16 (§2) | Accepted as proposed, except for the items changed above (M7 phone verification dropped, M8 → password, M10 → admin approval only).                                                                                                                                                                                                                                                         |
 | Hosting              | GitHub (public repo) + Vercel + Supabase free tier (EU) for a live demo.                                                                                                                                                                                                                                                                                                                    |
+| Architecture         | **Frontend-only with mock data in the browser** (2026-11-07, ADR 0003). The owner's laptop can't run the local Supabase/Docker stack, and the portfolio value is in the frontend. Email-based flows (confirmation, password reset) are dropped; sign-up signs in immediately.                                                                                                               |
 | Learning             | No tutorial files. The logic and key code of each step are explained in chat instead (updated 2026-11-02).                                                                                                                                                                                                                                                                                  |
 
 ---
@@ -119,7 +122,7 @@ The platform never talks to merchants or carriers. Every parcel status comes fro
 
 ---
 
-## 6. Architecture overview
+## 6. Architecture overview (original backend design, see ADR 0003)
 
 ```
 ┌──────────────── Browser (mobile-first PWA) ────────────────┐
@@ -159,7 +162,7 @@ Incidents don't change this state machine. An open incident is a flag (`has_open
 
 ---
 
-## 7. Database schema (initial)
+## 7. Database schema (original backend design; now mirrored by `src/mocks/types.ts`)
 
 > **Implemented in Phase 1, Step 3** (`supabase/migrations/`). Where the code and this section differ, the migrations are the source of truth. Deviations from the original draft:
 >
@@ -298,27 +301,27 @@ Host application (rules, caps, hours, time off, pause; address picked on a map),
 
 Location snapping already exists (Phase 1 trigger), and the `public_hosts` view was dropped in favour of RLS (§7). Steps:
 
-1. **Database** ✅: `submit_host_application(agreement_version)` (draft/rejected → pending_review; checks the area, address and hours exist; records the host agreement; audits; notifies admins) and `admin_review_host(host_id, decision, note)` (approve/reject/suspend/reinstate with fixed source states; a note is required to reject or suspend; approval grants the `host` role and suspension keeps it; admins can't review their own listing; audits; notifies the host). Pausing stays a plain owner-writable column.
-2. **"Become a host" form** in the customer area: type and name, rules and limits, opening hours, agreement.
+1. **Rules** ✅ (first as Postgres RPCs, now `src/features/hosting/service.ts`): `submitApplication` (draft/rejected → pending_review; checks the area, address and hours exist; records the host agreement; audits; notifies admins) and `reviewHost(adminId, hostId, decision, note)` (approve/reject/suspend/reinstate with fixed source states; a note is required to reject or suspend; approval grants the `host` role and suspension keeps it; admins can't review their own listing; audits; notifies the host). An application is locked while in review. Pausing stays a plain owner setting.
+2. **"Become a host" form** ✅ in the customer area: type and name, rules and limits, opening hours, agreement, with a live checklist. The location section waits for Step 3.
 3. **Location picker:** MapLibre + OpenFreeMap with Photon search and a draggable pin, plus a preview of the snapped public area. Phase 3's discovery map reuses it.
 4. **Admin approval queue:** pending list, detail (including the private address), approve/reject with a note.
 5. **Host settings:** edit the listing, hours, time off and pause; e2e tests; docs.
 
 ### Phase 3: Discovery and reservations
 
-Uber-style map discovery (geolocation, address search, approximate host markers, bottom-sheet details) with an accessible list-view alternative, host detail page, reservation request with attestation, host accept/decline, address reveal + copy instructions, cancellation, expiry jobs, realtime in-app notifications.
+Uber-style map discovery (geolocation, address search, approximate host markers, bottom-sheet details) with an accessible list-view alternative, host detail page, reservation request with attestation, host accept/decline, address reveal + copy instructions, cancellation, expiry (checked when data is read, since there are no background jobs), in-app notifications. Two-person flows are demonstrated by switching accounts in the same browser.
 
 ### Phase 4: Custody
 
-Parcel check-in by reference code with a photo upload, unknown-parcel → incident, storage list, pickup code (QR + PIN) issue/verify, handover, unclaimed job, customer status timeline.
+Parcel check-in by reference code with a photo (kept in the browser), unknown-parcel → incident, storage list, pickup code (QR + PIN) issue/verify, handover, unclaimed job, customer status timeline.
 
 ### Phase 5: Operations
 
-Incident workflow (both sides + admin queue), audit trail viewer, manual ledger, privacy export/deletion, pilot metrics dashboard (SQL views), account suspension.
+Incident workflow (both sides + admin queue), audit trail viewer, manual ledger, privacy export/deletion (download your data as JSON), metrics dashboard, account suspension.
 
 ### Phase 6: Pilot hardening
 
-Sentry + analytics, rate limiting (auth, RPCs), accessibility audit (WCAG 2.2 AA, axe in CI), PWA manifest, legal pages, retention purges, backup/restore drill, security review.
+Accessibility audit (WCAG 2.2 AA, axe in CI), PWA manifest, legal pages, Content-Security-Policy, performance budget, deployment of the demo (e.g. Vercel).
 
 Mapping to the brief's months: Phases 1–3 cover Month 2, and Phases 4–6 cover the start of Month 3, before the closed pilot.
 

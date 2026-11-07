@@ -72,3 +72,13 @@
   flex-wrap: wrap;
   gap: $space-3;
 }
+
+.demoTitle {
+  margin: 0 0 $space-2;
+  font-size: $font-size-lg;
+}
+
+.muted {
+  margin: 0 0 $space-4;
+  color: var(--color-text-muted);
+}

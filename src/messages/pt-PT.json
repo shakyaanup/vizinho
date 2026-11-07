@@ -28,7 +28,7 @@
     },
     "demo": {
       "title": "Explore a demonstração",
-      "body": "Este é um projeto de portefólio com dados fictícios. Entre diretamente com uma conta pronta a usar:",
+      "body": "Este é um projeto de portefólio só de frontend: tudo corre no seu navegador com dados fictícios. Entre diretamente com uma conta pronta:",
       "customer": "Experimentar como cliente",
       "customerHint": "Encontre anfitriões e reserve uma recolha",
       "host": "Experimentar como anfitrião",
@@ -45,7 +45,6 @@
       "title": "Entrar",
       "subtitle": "Bem-vindo de volta ao Vizinho.",
       "submit": "Entrar",
-      "forgotPassword": "Esqueceu-se da palavra-passe?",
       "noAccount": "Novo no Vizinho?",
       "signUpLink": "Criar conta"
     },
@@ -57,47 +56,25 @@
       "acceptTerms": "Aceito os Termos de Serviço e a Política de Privacidade",
       "submit": "Criar conta",
       "haveAccount": "Já tem conta?",
-      "logInLink": "Entrar",
-      "successTitle": "Verifique o seu email",
-      "successBody": "Se for possível registar {email}, enviámos um link de confirmação. Abra-o para ativar a sua conta.",
-      "localMailHint": "A executar localmente? Os emails chegam ao Mailpit em http://127.0.0.1:54324."
-    },
-    "forgot": {
-      "title": "Redefinir palavra-passe",
-      "subtitle": "Indique o seu email e enviamos-lhe um link para a redefinir.",
-      "submit": "Enviar link",
-      "successTitle": "Verifique o seu email",
-      "successBody": "Se existir uma conta para {email}, o link está a caminho. Expira em 1 hora.",
-      "backToLogin": "Voltar a entrar"
-    },
-    "reset": {
-      "title": "Escolha uma nova palavra-passe",
-      "newPassword": "Nova palavra-passe",
-      "submit": "Guardar palavra-passe"
+      "logInLink": "Entrar"
     },
     "signOut": "Sair",
     "errors": {
       "invalidCredentials": "Email ou palavra-passe incorretos.",
-      "emailNotConfirmed": "Confirme primeiro o seu email. Procure o link na sua caixa de entrada.",
-      "rateLimited": "Demasiadas tentativas. Aguarde um momento e tente novamente.",
-      "linkInvalid": "Este link é inválido ou expirou. Peça um novo.",
       "unexpected": "Ocorreu um erro. Tente novamente.",
       "emailInvalid": "Indique um endereço de email válido.",
       "passwordRequired": "Indique a sua palavra-passe.",
       "passwordTooShort": "Use pelo menos 8 caracteres.",
       "passwordWeak": "Use letras e números.",
       "passwordTooLong": "Use no máximo 72 caracteres.",
-      "passwordSame": "Escolha uma palavra-passe diferente da atual.",
       "nameRequired": "Indique o seu nome (2–100 caracteres).",
       "termsRequired": "Tem de aceitar os termos para continuar.",
-      "demoUnavailable": "A conta de demonstração não está disponível. Tente mais tarde."
+      "emailTaken": "Já existe uma conta com este email. Inicie sessão."
     }
   },
   "Account": {
     "title": "A sua conta",
     "welcome": "Olá, {name}",
-    "confirmed": "O seu email está confirmado. Bem-vindo ao Vizinho!",
-    "passwordUpdated": "A sua palavra-passe foi atualizada.",
     "email": "Email",
     "roles": "Perfis",
     "roleNames": {
@@ -161,7 +138,10 @@
       "emptyBody": "Encontre um anfitrião verificado perto de si e reserve um lugar antes de encomendar.",
       "findHost": "Encontrar anfitrião",
       "howTitle": "Como funciona o Vizinho",
-      "howBody": "Reserve um anfitrião, use a morada que ele partilha na compra e levante a encomenda com um código único."
+      "howBody": "Reserve um anfitrião, use a morada que ele partilha na compra e levante a encomenda com um código único.",
+      "hostCtaTitle": "Tem uma prateleira livre?",
+      "hostCtaBody": "Torne-se anfitrião: receba encomendas de pessoas perto de si e ganhe um pouco por cada levantamento.",
+      "hostCtaButton": "Tornar-se anfitrião"
     },
     "host": {
       "subtitle": "Gira pedidos, encomendas em armazém e a sua disponibilidade.",
@@ -216,5 +196,121 @@
         "audit": "Um registo só de acréscimo de todas as ações privilegiadas."
       }
     }
+  },
+  "Hosting": {
+    "title": "Tornar-se anfitrião",
+    "subtitle": "Receba encomendas dos seus vizinhos e ganhe um pouco por cada levantamento.",
+    "status": {
+      "pendingTitle": "A sua candidatura está em análise",
+      "pendingBody": "Um administrador vai analisá-la em breve. Não pode editá-la enquanto estiver em análise.",
+      "rejectedTitle": "Alterações pedidas",
+      "rejectedBody": "Atualize a sua candidatura e volte a submetê-la.",
+      "reviewNote": "Nota de quem analisou: {note}",
+      "approvedTitle": "É anfitrião Vizinho",
+      "approvedBody": "O seu anúncio está ativo. Gira pedidos e encomendas na sua área de anfitrião.",
+      "suspendedTitle": "O seu anúncio está suspenso",
+      "suspendedBody": "Os clientes não o podem encontrar nem reservar. As encomendas que guarda ainda podem ser levantadas.",
+      "goToHostArea": "Ir para a área de anfitrião"
+    },
+    "steps": {
+      "listing": "O seu anúncio",
+      "hours": "Horário",
+      "location": "Localização",
+      "submit": "Rever e submeter"
+    },
+    "listing": {
+      "intro": "Diga aos clientes quem é e o que pode receber.",
+      "hostType": "É anfitrião como",
+      "hostTypes": {
+        "individual": "Vizinho (casa particular)",
+        "business": "Comércio local"
+      },
+      "displayName": "Nome do anúncio",
+      "displayNameHint": "Visível para os clientes, por exemplo “Hugo em Arroios”.",
+      "businessName": "Nome do negócio",
+      "rulesText": "Regras da casa (opcional)",
+      "rulesTextHint": "Andar, campainha, quanto tempo guarda as encomendas, o que os clientes devem saber.",
+      "maxParcelSize": "Maior encomenda que aceita",
+      "sizes": {
+        "small": "Pequena: cabe numa caixa de sapatos",
+        "medium": "Média: até uma mala de cabine",
+        "large": "Grande: até uma mala de viagem"
+      },
+      "maxValue": "Valor declarado máximo (€)",
+      "maxValueHint": "Não receberá encomendas declaradas acima deste valor. Até 1000 €.",
+      "capacity": "Encomendas em simultâneo",
+      "capacityHint": "Entre 1 e 50.",
+      "save": "Guardar anúncio",
+      "saved": "Anúncio guardado."
+    },
+    "hours": {
+      "intro": "Quando podem os clientes levantar encomendas? Um período por dia.",
+      "openOn": "Aberto: {day}",
+      "opens": "Abre",
+      "closes": "Fecha",
+      "closed": "Fechado",
+      "save": "Guardar horário",
+      "saved": "Horário guardado.",
+      "needListing": "Guarde primeiro o seu anúncio.",
+      "opensOn": "Hora de abertura: {day}",
+      "closesOn": "Hora de fecho: {day}"
+    },
+    "weekdays": {
+      "1": "segunda-feira",
+      "2": "terça-feira",
+      "3": "quarta-feira",
+      "4": "quinta-feira",
+      "5": "sexta-feira",
+      "6": "sábado",
+      "7": "domingo"
+    },
+    "location": {
+      "intro": "Vai marcar a sua morada num mapa. Os clientes só veem uma zona aproximada até aceitar a reserva.",
+      "comingSoon": "Disponível na próxima atualização"
+    },
+    "submit": {
+      "intro": "Quando todos os passos estiverem concluídos, envie a candidatura à nossa equipa.",
+      "checklistLabel": "Lista da candidatura",
+      "done": "Concluído",
+      "missing": "Por fazer",
+      "agreementTitle": "Acordo de anfitrião",
+      "agreement1": "Só recebo encomendas de reservas que aceitei na Vizinho.",
+      "agreement2": "Guardo as encomendas em segurança e fechadas, e só as entrego com um código de levantamento válido.",
+      "agreement3": "Registo com honestidade cada receção e entrega na aplicação.",
+      "agreement4": "Posso recusar qualquer encomenda e nunca aceito artigos proibidos.",
+      "acceptAgreement": "Aceito o acordo de anfitrião",
+      "submit": "Submeter para análise",
+      "incompleteHint": "Conclua os passos acima para submeter.",
+      "submitted": "Candidatura enviada. Avisamos quando for analisada."
+    },
+    "errors": {
+      "unexpected": "Algo correu mal. Tente novamente.",
+      "unauthenticated": "A sua sessão terminou. Inicie sessão novamente.",
+      "locked": "A sua candidatura está em análise e não pode ser alterada agora.",
+      "noListing": "Guarde primeiro o seu anúncio.",
+      "incomplete": "A sua candidatura ainda não está completa.",
+      "alreadySubmitted": "Esta candidatura já foi submetida.",
+      "invalidChoice": "Escolha uma das opções.",
+      "displayName": "Use entre 2 e 60 caracteres.",
+      "businessName": "Indique o nome do negócio (2–120 caracteres).",
+      "tooLong": "O texto é demasiado longo.",
+      "maxValue": "Indique um número inteiro de euros entre 1 e 1000.",
+      "capacity": "Indique um número entre 1 e 50.",
+      "time": "Indique uma hora válida.",
+      "closesBeforeOpens": "A hora de fecho tem de ser depois da hora de abertura.",
+      "noHours": "Abra pelo menos um dia.",
+      "acceptAgreement": "Tem de aceitar o acordo de anfitrião.",
+      "forbidden": "Não tem permissão para fazer isso.",
+      "notFound": "Esse anúncio não existe.",
+      "invalidTransition": "Essa ação não é possível no estado atual deste anúncio.",
+      "noteRequired": "Adicione uma nota a explicar a decisão."
+    }
+  },
+  "Demo": {
+    "badge": "Demo",
+    "note": "Tudo aqui são dados fictícios, guardados apenas neste navegador. Nada é enviado para um servidor.",
+    "reset": "Repor dados de demonstração",
+    "resetDone": "Os dados de demonstração foram repostos.",
+    "resetHint": "Repõe os anfitriões, reservas e contas originais. As contas que criou são removidas."
   }
 }

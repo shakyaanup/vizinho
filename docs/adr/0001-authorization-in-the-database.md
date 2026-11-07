@@ -1,6 +1,6 @@
 # ADR 0001: Enforce authorization in Postgres (RLS + RPCs), deny by default
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR 0003](0003-frontend-only-with-mock-data.md) on 2026-11-07. Kept as the design for a future real backend.
 - **Date:** 2026-11-02
 
 ## Context

@@ -1,0 +1,203 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.form {
+  display: grid;
+  gap: $space-5;
+}
+
+// Resets the browser's fieldset box; `disabled` on it locks every control.
+.fieldset {
+  display: grid;
+  gap: $space-5;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.pair {
+  display: grid;
+  gap: $space-5;
+
+  @include respond-to("sm") {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.textarea {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: $space-2 $space-3;
+  font: inherit;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  resize: vertical;
+  background: var(--color-surface);
+  border: $border-width solid var(--color-border-strong);
+  border-radius: $radius-md;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow:
+      0 0 0 3px var(--color-primary-subtle),
+      0 0 0 1px var(--color-primary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--color-surface-sunken);
+    opacity: 0.7;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  align-items: center;
+}
+
+.saved {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-success);
+}
+
+.muted {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}
+
+// ---------- Opening hours ----------
+.days {
+  display: grid;
+  gap: $space-2;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.day {
+  display: grid;
+  gap: $space-2;
+  align-items: center;
+  padding: $space-2 0;
+  border-bottom: $border-width solid var(--color-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  @include respond-to("sm") {
+    grid-template-columns: 13rem 1fr;
+  }
+}
+
+.dayToggle {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+  min-height: $control-height-md;
+  cursor: pointer;
+}
+
+.checkbox {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+
+  @include focus-ring;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: $space-2;
+  align-items: center;
+  max-width: 20rem;
+}
+
+.timeSeparator {
+  color: var(--color-text-muted);
+}
+
+.closed {
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}
+
+.dayError {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-danger);
+}
+
+// ---------- Submit ----------
+.checklist {
+  display: grid;
+  gap: $space-2;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: $space-2;
+    align-items: center;
+  }
+
+  svg {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.checkDone svg {
+  color: var(--color-success);
+}
+
+.checkTodo svg {
+  color: var(--color-text-muted);
+}
+
+.checkState {
+  margin-left: auto;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}
+
+.agreement {
+  padding: $space-4;
+  background: var(--color-surface-sunken);
+  border-radius: $radius-md;
+
+  ul {
+    display: grid;
+    gap: $space-2;
+    padding-left: $space-5;
+    margin: 0;
+  }
+}
+
+.agreementTitle {
+  margin: 0 0 $space-3;
+  font-size: $font-size-base;
+}
+
+.checkboxRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: $space-3;
+  align-items: start;
+}

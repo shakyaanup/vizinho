@@ -9,9 +9,8 @@ import { UserMenuClient } from "./UserMenuClient";
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ href, ...props }: ComponentProps<"a">) => <a href={String(href)} {...props} />,
   usePathname: () => "/host",
-  useRouter: () => ({ replace: vi.fn() }),
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
 }));
-vi.mock("@/features/auth/actions", () => ({ signOut: vi.fn() }));
 
 function renderMenu(props: Partial<ComponentProps<typeof UserMenuClient>> = {}) {
   return render(

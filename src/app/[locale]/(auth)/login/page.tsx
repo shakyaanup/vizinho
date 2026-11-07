@@ -10,20 +10,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Reads ?next= and ?error= on the server and passes them down, so the form is
- * server-rendered and works even before JavaScript loads. (Reading them with
- * the client hook useSearchParams would make React skip SSR for the form.)
+ * Reads ?next= on the server and passes it down, so the form is server-
+ * rendered. (Reading it with the client hook useSearchParams would make React
+ * skip SSR for the form.)
  */
 async function LoginFormWithParams({
   searchParams,
 }: Pick<PageProps<"/[locale]/login">, "searchParams">) {
-  const { next, error } = await searchParams;
-  return (
-    <LoginForm
-      next={typeof next === "string" ? next : undefined}
-      linkInvalid={error === "linkInvalid"}
-    />
-  );
+  const { next } = await searchParams;
+  return <LoginForm next={typeof next === "string" ? next : undefined} />;
 }
 
 export default async function LoginPage({ searchParams }: PageProps<"/[locale]/login">) {
