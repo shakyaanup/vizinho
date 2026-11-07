@@ -154,7 +154,12 @@ test("reset demo data restores the seed", async ({ page }) => {
   await signUp(page, "Temporary Person");
   await page.goto("/account");
   await page.getByRole("button", { name: "Reset demo data" }).click();
-  await expect(visible(page.getByText("Demo data has been reset."))).toBeVisible();
+  // Scoped to the toast region: Radix also adds a hidden copy for screen readers.
+  await expect(
+    page
+      .getByRole("region", { name: /Notifications/ })
+      .getByText("Demo data has been reset."),
+  ).toBeVisible();
   // The account created above no longer exists, so its session ends.
   await page.goto("/customer");
   await expect(page).toHaveURL(/\/login\?next=%2Fcustomer/);
