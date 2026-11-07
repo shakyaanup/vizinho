@@ -1,0 +1,37 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-sunken);
+  border: $border-width solid var(--color-border);
+  border-radius: $radius-md;
+}
+
+.map {
+  width: 100%;
+  height: 18rem;
+
+  @include respond-to("md") {
+    height: 22rem;
+  }
+}
+
+// The pin's tip sits exactly on the map centre.
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--color-primary);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 30%));
+  transform: translate(-50%, -100%);
+
+  // Fill the pin's body so it reads on any map colour.
+  :global(path) {
+    fill: var(--color-surface);
+  }
+}

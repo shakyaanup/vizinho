@@ -31,19 +31,6 @@
   color: var(--color-text-muted);
 }
 
-.comingSoon {
-  display: flex;
-  gap: $space-3;
-  align-items: center;
-  margin: 0;
-  color: var(--color-text-muted);
-
-  svg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-}
-
 .statusAction {
   margin-top: $space-3;
 }

@@ -7,12 +7,13 @@ import {
   ownerId,
 } from "@/mocks/seed";
 import type { DemoDb, User } from "@/mocks/types";
-import type { ListingInput } from "./schemas";
+import type { ListingInput, LocationInput } from "./schemas";
 import {
   applicationChecklist,
   replaceWeeklyHours,
   reviewHost,
   saveListing,
+  saveLocation,
   submitApplication,
 } from "./service";
 
@@ -252,5 +253,51 @@ describe("admin review", () => {
     expect(db.users.find((u) => u.id === ownerId(18))!.roles).toContain("host");
     expectRule(() => reviewHost(db, ADMIN, "missing", "approve"), "notFound");
     expect(db.hosts.find((h) => h.id === HUGO_HOST_ID)!.status).toBe("approved");
+  });
+});
+
+describe("saving the location", () => {
+  const input: LocationInput = {
+    addressLine1: "Rua de Arroios 42",
+    addressLine2: "2º Esq.",
+    postalCode: "1150-054",
+    city: "Lisboa",
+    areaLabel: "Arroios, Lisboa",
+    accessInstructions: null,
+    lng: -9.13487,
+    lat: 38.73162,
+  };
+
+  it("needs a listing first", () => {
+    expectRule(() => saveLocation(db, hana.id, input), "noListing");
+  });
+
+  it("keeps the exact point private and publishes only the snapped pin", () => {
+    saveListing(db, hana.id, listing);
+    const host = saveLocation(db, hana.id, input);
+    expect(host.publicLocation).toEqual({ lng: -9.135, lat: 38.732 });
+    expect(host.areaLabel).toBe("Arroios, Lisboa");
+    const details = db.hostPrivateDetails.find((d) => d.hostId === host.id)!;
+    expect(details.exactLocation).toEqual({ lng: -9.13487, lat: 38.73162 });
+    expect(applicationChecklist(db, host).location).toBe(true);
+  });
+
+  it("updates the same record when saved again", () => {
+    const host = saveListing(db, hana.id, listing);
+    saveLocation(db, hana.id, input);
+    saveLocation(db, hana.id, { ...input, addressLine1: "Rua de Arroios 44" });
+    const mine = db.hostPrivateDetails.filter((d) => d.hostId === host.id);
+    expect(mine.map((d) => d.addressLine1)).toEqual(["Rua de Arroios 44"]);
+  });
+
+  it("refuses places outside mainland Portugal, and edits while in review", () => {
+    saveListing(db, hana.id, listing);
+    expectRule(
+      () => saveLocation(db, hana.id, { ...input, lng: -3.7, lat: 40.4 }),
+      "outsidePortugal",
+    );
+    completeApplication();
+    submitApplication(db, hana.id, "2026-11");
+    expectRule(() => saveLocation(db, hana.id, input), "locked");
   });
 });

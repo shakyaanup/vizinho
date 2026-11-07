@@ -82,3 +82,36 @@ export function readHoursForm(formData: FormData) {
 export const submitSchema = z.object({
   acceptAgreement: z.literal("on", "acceptAgreement"),
 });
+
+// Hidden inputs post strings; an empty one means the pin was never placed.
+const coordinate = (min: number, max: number) =>
+  z
+    .string()
+    .trim()
+    .min(1, "locationRequired")
+    .transform(Number)
+    .pipe(
+      z
+        .number("locationRequired")
+        .min(min, "outsidePortugal")
+        .max(max, "outsidePortugal"),
+    );
+
+/** The host's private address and the exact point on the map. */
+export const locationSchema = z.object({
+  addressLine1: z.string().trim().min(3, "addressLine1").max(120, "addressLine1"),
+  addressLine2: optionalText(120),
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{3}$/, "postalCode"),
+  city: z.string().trim().min(2, "city").max(80, "city"),
+  areaLabel: z.string().trim().min(2, "areaLabel").max(80, "areaLabel"),
+  accessInstructions: optionalText(500),
+  // Mainland Portugal, matching PORTUGAL_BOUNDS.
+  lng: coordinate(-9.6, -6.1),
+  lat: coordinate(36.9, 42.2),
+});
+
+export type LocationInput = z.infer<typeof locationSchema>;
+export type LocationField = keyof z.input<typeof locationSchema>;

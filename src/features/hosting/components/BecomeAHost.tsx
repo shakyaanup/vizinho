@@ -1,11 +1,9 @@
 "use client";
 
-import { MapPinned } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Alert } from "@/components/ui/Alert";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +12,7 @@ import { useDemoState } from "@/mocks/store";
 import { applicationChecklist, hoursByDay, isEditable } from "../service";
 import { HoursForm } from "./HoursForm";
 import { ListingForm, type ListingDefaults } from "./ListingForm";
+import { LocationForm, type LocationDefaults } from "./LocationForm";
 import { SubmitForm } from "./SubmitForm";
 import styles from "./become-a-host.module.scss";
 
@@ -29,10 +28,12 @@ export function BecomeAHost() {
       ? {
           listing,
           hours: hoursByDay(state.db, listing.id),
+          address:
+            state.db.hostPrivateDetails.find((d) => d.hostId === listing.id) ?? null,
           checklist: applicationChecklist(state.db, listing),
           editable: isEditable(listing),
         }
-      : { listing: null, hours: {}, checklist: null, editable: true };
+      : { listing: null, hours: {}, address: null, checklist: null, editable: true };
   }, [state, user.id]);
 
   const header = <PageHeader title={t("title")} subtitle={t("subtitle")} />;
@@ -72,6 +73,17 @@ export function BecomeAHost() {
     capacity: String(listing?.maxConcurrentParcels ?? 5),
   };
 
+  const { address } = application;
+  const locationDefaults: LocationDefaults = {
+    addressLine1: address?.addressLine1 ?? "",
+    addressLine2: address?.addressLine2 ?? "",
+    postalCode: address?.postalCode ?? "",
+    city: address?.city ?? "Lisboa",
+    areaLabel: listing?.areaLabel ?? "",
+    accessInstructions: address?.accessInstructions ?? "",
+    location: address?.exactLocation ?? null,
+  };
+
   return (
     <>
       {header}
@@ -109,10 +121,11 @@ export function BecomeAHost() {
         <Card as="section" aria-labelledby="step-location">
           <StepHeading id="step-location" number={3} title={t("steps.location")} />
           <p className={styles.intro}>{t("location.intro")}</p>
-          <p className={styles.comingSoon}>
-            <MapPinned aria-hidden />
-            <Badge>{t("location.comingSoon")}</Badge>
-          </p>
+          {listing ? (
+            <LocationForm defaults={locationDefaults} editable={editable} />
+          ) : (
+            <p className={styles.intro}>{t("hours.needListing")}</p>
+          )}
         </Card>
 
         <Card as="section" aria-labelledby="step-submit">

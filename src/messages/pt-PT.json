@@ -265,8 +265,33 @@
       "7": "domingo"
     },
     "location": {
-      "intro": "Vai marcar a sua morada num mapa. Os clientes só veem uma zona aproximada até aceitar a reserva.",
-      "comingSoon": "Disponível na próxima atualização"
+      "intro": "Marque a sua morada no mapa. Os clientes só veem uma zona aproximada até aceitar a reserva.",
+      "search": "Pesquisar a sua morada",
+      "searchPlaceholder": "por exemplo Rua de Arroios 42, Lisboa",
+      "searching": "A pesquisar…",
+      "noResults": "Nenhuma morada encontrada. Experimente o nome da rua e o número.",
+      "resultsCount": "{count, plural, one {# morada encontrada} other {# moradas encontradas}}. Use as setas para cima e para baixo para escolher.",
+      "searchFailed": "A pesquisa de moradas não está disponível agora. Mova o mapa para colocar o marcador e escreva a sua morada.",
+      "attribution": "Pesquisa de moradas por Photon · © contribuidores do OpenStreetMap",
+      "useMyLocation": "Usar a minha localização atual",
+      "locating": "A localizar…",
+      "geolocationDenied": "O acesso à localização foi bloqueado. Pesquise a sua morada ou mova o mapa.",
+      "geolocationUnavailable": "A sua localização não está disponível. Pesquise a sua morada ou mova o mapa.",
+      "mapLabel": "Mapa. Mova-o até o marcador ficar na sua porta.",
+      "mapHint": "Mova o mapa até o marcador ficar na sua porta. Aproxime para mais precisão.",
+      "privacyTitle": "O que os clientes veem",
+      "privacyBody": "Apenas o quadrado sombreado (cerca de 400 m), até aceitar a reserva. A sua morada exata só é partilhada nessa altura.",
+      "addressLine1": "Rua e número",
+      "addressLine2": "Andar e porta (opcional)",
+      "postalCode": "Código postal",
+      "postalCodeHint": "Formato: 1150-054",
+      "city": "Localidade",
+      "areaLabel": "Bairro",
+      "areaLabelHint": "Visível para os clientes, por exemplo “Arroios, Lisboa”.",
+      "accessInstructions": "Como o encontrar (opcional)",
+      "accessInstructionsHint": "Nome na campainha, entrada, andar. Só é partilhado depois de aceitar uma reserva.",
+      "save": "Guardar localização",
+      "saved": "Localização guardada."
     },
     "submit": {
       "intro": "Quando todos os passos estiverem concluídos, envie a candidatura à nossa equipa.",
@@ -303,7 +328,13 @@
       "forbidden": "Não tem permissão para fazer isso.",
       "notFound": "Esse anúncio não existe.",
       "invalidTransition": "Essa ação não é possível no estado atual deste anúncio.",
-      "noteRequired": "Adicione uma nota a explicar a decisão."
+      "noteRequired": "Adicione uma nota a explicar a decisão.",
+      "addressLine1": "Indique a rua e o número (3–120 caracteres).",
+      "postalCode": "Use o formato português 1234-567.",
+      "city": "Indique a localidade.",
+      "areaLabel": "Indique o seu bairro (2–80 caracteres).",
+      "locationRequired": "Coloque o marcador na sua porta: pesquise a morada ou mova o mapa.",
+      "outsidePortugal": "Os anfitriões Vizinho têm de estar em Portugal continental."
     }
   },
   "Demo": {

@@ -18,6 +18,27 @@ export function snapToGrid({ lng, lat }: LngLat): LngLat {
   return { lng: round(lng, LNG_STEP), lat: round(lat, LAT_STEP) };
 }
 
+/**
+ * The grid cell a location falls into, as [west, south, east, north]. Every
+ * location in this square gets the same public pin (the cell's centre), so
+ * it's what customers can learn about where a host lives.
+ */
+export function gridCell(location: LngLat): [number, number, number, number] {
+  const { lng, lat } = snapToGrid(location);
+  return [lng - LNG_STEP / 2, lat - LAT_STEP / 2, lng + LNG_STEP / 2, lat + LAT_STEP / 2];
+}
+
+/** Mainland Portugal (+ a margin): hosts must be here. [west, south, east, north] */
+export const PORTUGAL_BOUNDS = [-9.6, 36.9, -6.1, 42.2] as const;
+
+export function isInPortugal({ lng, lat }: LngLat) {
+  const [west, south, east, north] = PORTUGAL_BOUNDS;
+  return lng >= west && lng <= east && lat >= south && lat <= north;
+}
+
+/** Where the map opens when there's no location yet: central Lisbon. */
+export const LISBON_CENTER: LngLat = { lng: -9.1393, lat: 38.7223 };
+
 /** Great-circle distance in metres (haversine). */
 export function distanceMetres(a: LngLat, b: LngLat): number {
   const R = 6_371_000;

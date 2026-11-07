@@ -18,7 +18,14 @@ const eslintConfig = defineConfig([
   },
   // Must stay last: turns off stylistic rules that Prettier owns.
   prettier,
-  globalIgnores([".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "next-env.d.ts",
+    "public/maplibre/**",
+  ]),
 ]);
 
 export default eslintConfig;

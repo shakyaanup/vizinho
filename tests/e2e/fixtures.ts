@@ -8,7 +8,54 @@ export { expect };
  * React runtime errors show up there, not in assertions. A test that expects
  * a specific error (e.g. a 404 page) declares it with `consoleErrors.allow()`.
  */
-export const test = base.extend<{ consoleErrors: { allow: (pattern: RegExp) => void } }>({
+/** What the fake Photon geocoder returns for any search (one Arroios address). */
+export const PHOTON_RESULT = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [-9.1361503, 38.7278371] },
+      properties: {
+        osm_type: "N",
+        osm_id: 3996071872,
+        housenumber: "42A",
+        street: "Rua de Arroios",
+        district: "Arroios",
+        city: "Lisboa",
+        postcode: "1150-055",
+        countrycode: "PT",
+      },
+    },
+  ],
+};
+
+// A map style with no tiles: the map renders a plain background, offline.
+const BLANK_MAP_STYLE = {
+  version: 8,
+  sources: {},
+  layers: [
+    { id: "background", type: "background", paint: { "background-color": "#e7e5e4" } },
+  ],
+};
+
+export const test = base.extend<{
+  consoleErrors: { allow: (pattern: RegExp) => void };
+  fakeExternalServices: void;
+}>({
+  // Tests never call the internet: map tiles and address search are faked,
+  // so a slow or down third-party service can't make the suite flaky.
+  fakeExternalServices: [
+    async ({ page }, use) => {
+      await page.route("https://tiles.openfreemap.org/**", (route) =>
+        route.fulfill({ json: BLANK_MAP_STYLE }),
+      );
+      await page.route("https://photon.komoot.io/**", (route) =>
+        route.fulfill({ json: PHOTON_RESULT }),
+      );
+      await use();
+    },
+    { auto: true },
+  ],
   consoleErrors: [
     async ({ page }, use) => {
       const errors: string[] = [];

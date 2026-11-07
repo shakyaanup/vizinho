@@ -7,7 +7,8 @@ import type {
   Weekday,
 } from "@/mocks/types";
 import type { HostingErrorCode } from "./form-state";
-import type { HoursInput, ListingInput } from "./schemas";
+import { isInPortugal, snapToGrid } from "./location";
+import type { HoursInput, ListingInput, LocationInput } from "./schemas";
 
 // Host application rules. These were Postgres functions and RLS policies in
 // the original backend design (docs/adr/0001); they keep the same rules here
@@ -124,6 +125,39 @@ export function replaceWeeklyHours(db: DemoDb, userId: string, slots: HoursInput
       closesAt: slot.closesAt,
     })),
   );
+}
+
+/**
+ * Saves the caller's private address and exact point, and derives the public
+ * pin from it. The exact point never leaves hostPrivateDetails; customers
+ * only ever see publicLocation (snapped to the grid) and the area label.
+ */
+export function saveLocation(db: DemoDb, userId: string, input: LocationInput) {
+  const host = ownListing(db, userId) ?? fail("noListing");
+  if (!isEditable(host)) fail("locked");
+
+  const exactLocation = { lng: input.lng, lat: input.lat };
+  if (!isInPortugal(exactLocation)) fail("outsidePortugal");
+
+  const details = {
+    hostId: host.id,
+    addressLine1: input.addressLine1,
+    addressLine2: input.addressLine2,
+    postalCode: input.postalCode,
+    city: input.city,
+    exactLocation,
+    accessInstructions: input.accessInstructions,
+  };
+  const index = db.hostPrivateDetails.findIndex((d) => d.hostId === host.id);
+  if (index === -1) db.hostPrivateDetails.push(details);
+  else db.hostPrivateDetails[index] = details;
+
+  Object.assign(host, {
+    areaLabel: input.areaLabel,
+    publicLocation: snapToGrid(exactLocation),
+    updatedAt: new Date().toISOString(),
+  });
+  return host;
 }
 
 /** What submitApplication requires, for the checklist in the form. */

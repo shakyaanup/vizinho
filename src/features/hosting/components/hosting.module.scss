@@ -201,3 +201,74 @@
   gap: $space-3;
   align-items: start;
 }
+
+// ---------- Location ----------
+.search {
+  display: grid;
+  gap: $space-2;
+}
+
+.results {
+  display: grid;
+  padding: $space-1;
+  margin: 0;
+  list-style: none;
+  background: var(--color-surface);
+  border: $border-width solid var(--color-border-strong);
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-md);
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  min-height: $touch-target;
+  padding: $space-2 $space-3;
+  cursor: pointer;
+  border-radius: $radius-sm;
+
+  &:hover,
+  &[aria-selected="true"] {
+    background: var(--color-primary-subtle);
+  }
+}
+
+.searchStatus {
+  min-height: 1lh;
+  margin: 0;
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+
+  &:empty {
+    min-height: 0;
+  }
+}
+
+.attribution {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: var(--color-text-muted);
+}
+
+.locate {
+  display: grid;
+  gap: $space-2;
+  justify-items: start;
+}
+
+.mapBlock {
+  display: grid;
+  gap: $space-3;
+}
+
+.privacy {
+  padding: $space-3 $space-4;
+  background: var(--color-surface-sunken);
+  border-left: 3px solid var(--color-primary);
+  border-radius: $radius-sm;
+}
+
+.privacyTitle {
+  margin: 0 0 $space-1;
+  font-weight: $font-weight-semibold;
+}

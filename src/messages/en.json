@@ -265,8 +265,33 @@
       "7": "Sunday"
     },
     "location": {
-      "intro": "You'll pin your address on a map. Customers only see an approximate area until you accept their reservation.",
-      "comingSoon": "Available in the next update"
+      "intro": "Pin your address on the map. Customers only see an approximate area until you accept their reservation.",
+      "search": "Search your address",
+      "searchPlaceholder": "e.g. Rua de Arroios 42, Lisboa",
+      "searching": "Searching…",
+      "noResults": "No addresses found. Try the street name and number.",
+      "resultsCount": "{count, plural, one {# address found} other {# addresses found}}. Use the up and down arrows to choose.",
+      "searchFailed": "Address search isn't available right now. Move the map to place the pin, then type your address.",
+      "attribution": "Address search by Photon · © OpenStreetMap contributors",
+      "useMyLocation": "Use my current location",
+      "locating": "Finding you…",
+      "geolocationDenied": "Location access was blocked. Search for your address or move the map instead.",
+      "geolocationUnavailable": "Your location isn't available. Search for your address or move the map instead.",
+      "mapLabel": "Map. Move it so the pin sits on your door.",
+      "mapHint": "Move the map so the pin sits on your door. Zoom in for precision.",
+      "privacyTitle": "What customers see",
+      "privacyBody": "Only the shaded square (about 400 m across), until you accept their reservation. Your exact address is shared only then.",
+      "addressLine1": "Street and number",
+      "addressLine2": "Floor and door (optional)",
+      "postalCode": "Postal code",
+      "postalCodeHint": "Format: 1150-054",
+      "city": "City",
+      "areaLabel": "Neighbourhood",
+      "areaLabelHint": "Shown to customers, e.g. “Arroios, Lisboa”.",
+      "accessInstructions": "How to find you (optional)",
+      "accessInstructionsHint": "Buzzer name, entrance, floor. Shared only after you accept a reservation.",
+      "save": "Save location",
+      "saved": "Location saved."
     },
     "submit": {
       "intro": "When every step is done, send your application to our team.",
@@ -303,7 +328,13 @@
       "forbidden": "You don't have permission to do that.",
       "notFound": "That listing doesn't exist.",
       "invalidTransition": "That action isn't possible for this listing's current status.",
-      "noteRequired": "Add a note explaining the decision."
+      "noteRequired": "Add a note explaining the decision.",
+      "addressLine1": "Enter the street and number (3–120 characters).",
+      "postalCode": "Use the Portuguese format 1234-567.",
+      "city": "Enter the city.",
+      "areaLabel": "Enter your neighbourhood (2–80 characters).",
+      "locationRequired": "Place the pin on your door: search for your address or move the map.",
+      "outsidePortugal": "Vizinho hosts must be in mainland Portugal."
     }
   },
   "Demo": {

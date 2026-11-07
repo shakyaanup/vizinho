@@ -16,3 +16,23 @@ export function useTheme(): [Theme, (theme: Theme) => void] {
   );
   return [theme, applyTheme];
 }
+
+const darkQuery = "(prefers-color-scheme: dark)";
+
+function subscribeToSystemTheme(onChange: () => void) {
+  const media = window.matchMedia(darkQuery);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+/** The theme actually showing ("system" resolved via the OS setting). */
+export function useResolvedTheme(): "light" | "dark" {
+  const [theme] = useTheme();
+  const systemDark = useSyncExternalStore(
+    subscribeToSystemTheme,
+    () => window.matchMedia(darkQuery).matches,
+    () => false,
+  );
+  if (theme === "system") return systemDark ? "dark" : "light";
+  return theme;
+}

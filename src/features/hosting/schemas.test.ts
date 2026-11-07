@@ -1,4 +1,4 @@
-import { hoursSchema, listingSchema, readHoursForm } from "./schemas";
+import { hoursSchema, listingSchema, locationSchema, readHoursForm } from "./schemas";
 
 const listing = {
   hostType: "individual",
@@ -98,5 +98,49 @@ describe("opening hours", () => {
       { weekday: 3, opensAt: "25:00", closesAt: "26:00" },
     ]);
     expect(result.error?.issues[0]?.message).toBe("time");
+  });
+});
+
+describe("locationSchema", () => {
+  const form = {
+    addressLine1: "Rua de Arroios 42",
+    addressLine2: "",
+    postalCode: "1150-054",
+    city: "Lisboa",
+    areaLabel: "Arroios, Lisboa",
+    accessInstructions: "",
+    lng: "-9.13487",
+    lat: "38.73162",
+  };
+
+  it("parses coordinates from hidden inputs", () => {
+    expect(locationSchema.parse(form)).toMatchObject({
+      lng: -9.13487,
+      lat: 38.73162,
+      addressLine2: null,
+    });
+  });
+
+  it("asks for the pin when it was never placed, and for a valid postcode", () => {
+    const result = locationSchema.safeParse({
+      ...form,
+      lng: "",
+      lat: "",
+      postalCode: "1150",
+    });
+    expect(issuesOf(result)).toEqual({
+      lng: "locationRequired",
+      lat: "locationRequired",
+      postalCode: "postalCode",
+    });
+  });
+
+  it("refuses points outside mainland Portugal", () => {
+    // Madrid: same latitude band as Portugal, but too far east.
+    expect(
+      issuesOf(locationSchema.safeParse({ ...form, lng: "-3.70", lat: "40.41" })),
+    ).toEqual({
+      lng: "outsidePortugal",
+    });
   });
 });

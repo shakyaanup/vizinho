@@ -30,12 +30,12 @@ The app is available in English (`/`) and European Portuguese (`/pt`), in light 
 
 - **Three role-based areas** (customer, host, admin) with a phone tab bar and a desktop sidebar. Users with several roles switch areas from the account menu.
 - **Accounts:** sign-up and log-in with validation, one-click demo logins, and safe redirects back to the page you came from.
-- **Become a host:** a multi-step application (listing, opening hours, location, host agreement) with a live checklist. It's locked while an admin reviews it.
+- **Become a host:** a multi-step application (listing, opening hours, location, host agreement) with a live checklist. The location step has an Uber-style map (MapLibre + OpenFreeMap), address search (Photon) and "use my current location", and shows the approximate square customers will see. The application is locked while an admin reviews it.
 - **Host approval rules:** draft → in review → approved / rejected → suspended / reinstated. Each decision is allowed from one state only, rejections need a reason, admins can't approve their own listing, and every decision is written to an audit log and notifies the other side.
 - **Location privacy:** customers only ever see a host's position snapped to a ~400 m grid; exact addresses stay private.
 - **Bilingual, accessible, mobile-first:** next-intl with typed messages, WCAG 2.2 AA (labelled inputs, visible focus, 44 px touch targets, keyboard-operable menus), designed at 360 px first.
 
-Coming next (see the roadmap): a map to pick a host's location and find hosts nearby (MapLibre + OpenFreeMap), the admin approval queue, reservations and pickup codes.
+Coming next (see the roadmap): the admin approval queue, a map to find hosts nearby, reservations and pickup codes.
 
 ## Mock data
 
@@ -56,6 +56,7 @@ People, shops and addresses are invented; coordinates sit on real streets so the
 | i18n       | next-intl, locale in the URL (`/` English, `/pt` European Portuguese)                                     |
 | Validation | zod, with errors as translation keys                                                                      |
 | Data       | Typed mock data + a small `localStorage` store with all-or-nothing transactions                           |
+| Maps       | MapLibre GL + OpenFreeMap tiles + Photon address search (all free, no API keys)                           |
 | Tests      | Vitest + Testing Library (unit), Playwright (end-to-end)                                                  |
 
 The code is organised by feature: `src/features/<domain>/` holds each area's **service** (business rules), **schemas** (zod), **actions** (form handlers) and **components**. The services are pure functions over the mock database, written so a real backend could replace the store later without touching the UI.
@@ -72,11 +73,11 @@ pnpm dev            # http://localhost:3000
 ## Quality checks
 
 ```bash
-pnpm check          # typecheck, ESLint, Stylelint, Prettier, 90 unit tests
-pnpm test:e2e       # 27 Playwright tests on a production build (port 3100)
+pnpm check          # typecheck, ESLint, Stylelint, Prettier, 106 unit tests
+pnpm test:e2e       # 29 Playwright tests on a production build (port 3100)
 pnpm build
 ```
 
-The unit tests cover the business rules (the host application state machine, editing locks, the four-eyes rule), the mock data's integrity (snapped pins, consistent custody history, which accounts can sign in) and the store. The end-to-end tests run every role's flows on a phone-sized screen and on desktop, in both languages, and fail on any browser console error.
+The unit tests cover the business rules (the host application state machine, editing locks, the four-eyes rule), the mock data's integrity (snapped pins, consistent custody history, which accounts can sign in) and the store. The end-to-end tests run every role's flows on a phone-sized screen and on desktop, in both languages, and fail on any browser console error. They never call the internet: map tiles and address search are faked, so third-party outages can't make them flaky.
 
 GitHub Actions runs both on every push and pull request.

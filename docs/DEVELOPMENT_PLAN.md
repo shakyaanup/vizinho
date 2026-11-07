@@ -303,7 +303,7 @@ Location snapping already exists (Phase 1 trigger), and the `public_hosts` view 
 
 1. **Rules** ✅ (first as Postgres RPCs, now `src/features/hosting/service.ts`): `submitApplication` (draft/rejected → pending_review; checks the area, address and hours exist; records the host agreement; audits; notifies admins) and `reviewHost(adminId, hostId, decision, note)` (approve/reject/suspend/reinstate with fixed source states; a note is required to reject or suspend; approval grants the `host` role and suspension keeps it; admins can't review their own listing; audits; notifies the host). An application is locked while in review. Pausing stays a plain owner setting.
 2. **"Become a host" form** ✅ in the customer area: type and name, rules and limits, opening hours, agreement, with a live checklist. The location section waits for Step 3.
-3. **Location picker:** MapLibre + OpenFreeMap with Photon search and a draggable pin, plus a preview of the snapped public area. Phase 3's discovery map reuses it.
+3. **Location picker** ✅: MapLibre + OpenFreeMap with an Uber-style fixed centre pin, Photon address search (accessible combobox), "use my current location", and a shaded preview of the grid cell customers see. Saving stores the exact point privately and publishes only the snapped pin. Phase 3's discovery map reuses `LocationMap`.
 4. **Admin approval queue:** pending list, detail (including the private address), approve/reject with a note.
 5. **Host settings:** edit the listing, hours, time off and pause; e2e tests; docs.
 

@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Step 2 (the "Become a host" form) is built. **Next: Step 3, the location picker (MapLibre).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Steps 2–3 (the "Become a host" form with the map location picker) are built. **Next: Step 4, the admin approval queue.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -34,7 +34,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Stack
 
-Next.js 16.4 (App Router) · TypeScript strict · **SCSS Modules (no Tailwind)** · Radix UI primitives · MapLibre GL + OpenFreeMap + Photon geocoding (planned, key-free) · zod · next-intl (en default, pt-PT) · Vitest · Playwright · pnpm.
+Next.js 16.4 (App Router) · TypeScript strict · **SCSS Modules (no Tailwind)** · Radix UI primitives · MapLibre GL 6 + OpenFreeMap tiles + Photon geocoding (all key-free) · zod · next-intl (en default, pt-PT) · Vitest · Playwright · pnpm.
 
 ## Commands
 
@@ -74,6 +74,13 @@ pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 - **Locale:** URL segment `[locale]` (`/` = en, `/pt` = pt-PT; ADR 0002). Always use `Link`/`redirect`/`useRouter` from `@/i18n/navigation`. Forms that need the locale post a hidden `locale` field (`readLocale`).
 - **Redirect targets** from user input go through `safeRedirectPath()` (open-redirect guard).
 - **Demo accounts** (password `VizinhoDemo2026`): `customer@`, `host@`, `admin@demo.vizinho.app`.
+
+## Map & geocoding
+
+- `LocationMap` (`src/components/map/`) loads MapLibre on demand in the browser (dynamic import), with a fixed centre pin and an optional shaded square. Style follows `useResolvedTheme()`; colours come from CSS tokens at runtime.
+- MapLibre 6 runs tiles in a Web Worker from its own file: `scripts/copy-map-worker.mjs` copies it to `public/maplibre/` (git-ignored, run by `pnpm dev`/`pnpm build`) and the map calls `setWorkerUrl()`.
+- Address search: `src/features/hosting/geocoding.ts` (Photon, Portugal bbox, debounced, max 5 results). Keep the Photon/OSM attribution visible.
+- **E2E never calls external services:** the `fakeExternalServices` fixture serves a blank map style and a fixed Photon result.
 
 ## App shell & areas
 

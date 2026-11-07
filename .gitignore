@@ -52,3 +52,6 @@ supabase/.branches
 /playwright-report/
 /playwright/.cache/
 /blob-report/
+
+# copied from node_modules by scripts/copy-map-worker.mjs
+/public/maplibre/

@@ -7,12 +7,15 @@ import {
   HOST_AGREEMENT_VERSION,
   hoursSchema,
   listingSchema,
+  locationSchema,
   readHoursForm,
   submitSchema,
   type ListingField,
+  type LocationField,
 } from "./schemas";
 import {
   replaceWeeklyHours,
+  saveLocation as saveLocationRule,
   saveListing as saveListingRule,
   submitApplication as submitRule,
 } from "./service";
@@ -109,4 +112,34 @@ export async function submitApplication(
     submitRule(db, userId, HOST_AGREEMENT_VERSION),
   );
   return error ? { status: "error", formError: error } : { status: "success" };
+}
+
+const LOCATION_FIELDS: LocationField[] = [
+  "addressLine1",
+  "addressLine2",
+  "postalCode",
+  "city",
+  "areaLabel",
+  "accessInstructions",
+  "lng",
+  "lat",
+];
+
+export async function saveLocation(
+  _prev: HostingFormState<LocationField>,
+  formData: FormData,
+): Promise<HostingFormState<LocationField>> {
+  const values = Object.fromEntries(
+    LOCATION_FIELDS.map((field) => [field, String(formData.get(field) ?? "")]),
+  ) as Record<LocationField, string>;
+
+  const parsed = locationSchema.safeParse(values);
+  if (!parsed.success) {
+    return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), values };
+  }
+
+  const error = runAsCurrentUser((db, userId) =>
+    saveLocationRule(db, userId, parsed.data),
+  );
+  return error ? { status: "error", formError: error, values } : { status: "success" };
 }
