@@ -26,33 +26,6 @@
   }
 }
 
-.textarea {
-  width: 100%;
-  min-height: 5.5rem;
-  padding: $space-2 $space-3;
-  font: inherit;
-  font-size: $font-size-base;
-  color: var(--color-text);
-  resize: vertical;
-  background: var(--color-surface);
-  border: $border-width solid var(--color-border-strong);
-  border-radius: $radius-md;
-
-  &:focus-visible {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow:
-      0 0 0 3px var(--color-primary-subtle),
-      0 0 0 1px var(--color-primary);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    background: var(--color-surface-sunken);
-    opacity: 0.7;
-  }
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;

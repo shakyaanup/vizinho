@@ -16,6 +16,7 @@ import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { idleState } from "@/lib/forms/form-state";
 import type { LngLat } from "@/mocks/types";
 import { saveLocation } from "../actions";
@@ -331,12 +332,7 @@ export function LocationForm({ defaults, editable }: LocationFormProps) {
           hint={t("location.accessInstructionsHint")}
           error={fieldError("accessInstructions")}
         >
-          <textarea
-            rows={2}
-            maxLength={500}
-            className={styles.textarea}
-            {...text("accessInstructions")}
-          />
+          <Textarea rows={2} maxLength={500} {...text("accessInstructions")} />
         </Field>
 
         {editable && (

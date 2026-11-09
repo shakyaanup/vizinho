@@ -285,3 +285,16 @@ export function hoursByDay(db: DemoDb, hostId: string): HoursByDay {
   }
   return result;
 }
+
+/**
+ * An admin opens a host's private address. Allowed, but every view is
+ * audited, so access to home addresses can always be traced.
+ */
+export function viewPrivateDetails(db: DemoDb, adminId: string, hostId: string) {
+  const admin = db.users.find((user) => user.id === adminId);
+  if (!admin?.roles.includes("admin")) fail("forbidden");
+  const details =
+    db.hostPrivateDetails.find((d) => d.hostId === hostId) ?? fail("notFound");
+  audit(db, adminId, "host.private_details_viewed", hostId, {});
+  return details;
+}

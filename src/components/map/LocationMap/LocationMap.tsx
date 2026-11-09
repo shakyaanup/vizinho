@@ -25,7 +25,9 @@ type LocationMapProps = {
   center: LngLat;
   zoom?: number;
   /** Called when the user finishes moving the map (the pin's new position). */
-  onMove: (center: LngLat) => void;
+  onMove?: (center: LngLat) => void;
+  /** false: a fixed view (no panning or zooming), e.g. to show a saved place. */
+  interactive?: boolean;
   /** A square to shade, e.g. the public area customers will see. */
   highlight?: Bounds | null;
   /** Accessible name for the map region. */
@@ -63,6 +65,7 @@ export function LocationMap({
   zoom = 16,
   onMove,
   highlight = null,
+  interactive = true,
   label,
   className,
 }: LocationMapProps) {
@@ -91,16 +94,19 @@ export function LocationMap({
         style: MAP_STYLES[theme],
         center: [center.lng, center.lat],
         zoom,
+        interactive,
         attributionControl: { compact: true },
         // MapLibre labels its own canvas region; give it our translated name.
         locale: { "Map.Title": label },
       });
-      map.addControl(new NavigationControl({ showCompass: false }), "top-right");
+      if (interactive) {
+        map.addControl(new NavigationControl({ showCompass: false }), "top-right");
+      }
       map.on("moveend", (event) => {
         // Only user gestures report back; our own easeTo calls don't.
         if (!("originalEvent" in event) || !event.originalEvent) return;
         const { lng, lat } = map!.getCenter();
-        onMoveRef.current({ lng, lat });
+        onMoveRef.current?.({ lng, lat });
       });
       map.on("load", () => {
         // Start the attribution collapsed on small maps (the "i" button opens
@@ -119,9 +125,10 @@ export function LocationMap({
       mapRef.current = null;
       setReady(false);
     };
-    // Recreated only when the theme changes; other props update the live map.
+    // Recreated only when the theme or interactivity changes; other props
+    // update the live map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme]);
+  }, [theme, interactive]);
 
   // Follow `center` when it changes from outside (search, "use my location").
   useEffect(() => {

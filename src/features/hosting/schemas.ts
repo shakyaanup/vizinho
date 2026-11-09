@@ -115,3 +115,11 @@ export const locationSchema = z.object({
 
 export type LocationInput = z.infer<typeof locationSchema>;
 export type LocationField = keyof z.input<typeof locationSchema>;
+
+export const REVIEW_DECISIONS = ["approve", "reject", "suspend", "reinstate"] as const;
+
+export const reviewSchema = z.object({
+  hostId: z.string().min(1, "notFound"),
+  decision: z.enum(REVIEW_DECISIONS, "invalidTransition"),
+  note: optionalText(1000),
+});

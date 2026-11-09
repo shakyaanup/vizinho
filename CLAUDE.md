@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Steps 2–3 (the "Become a host" form with the map location picker) are built. **Next: Step 4, the admin approval queue.** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Steps 2–4 (the "Become a host" form with the map location picker, and the admin approval queue) are built. **Next: Step 5, host settings (edit listing, hours, time off, pause).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -26,7 +26,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 2. **No carrier/merchant integrations.** Never invent APIs or tracking for Amazon, CTT, DHL, DPD, etc. Parcel status comes only from host, customer, or admin actions. Never claim in UI copy that a merchant or carrier will accept a host address.
 3. **Business rules live in services** (`src/features/<domain>/service.ts`): pure functions over `DemoDb` that throw `DomainError(code)` when a rule is broken. They mirror the original Postgres RPCs (ADR 0001): check the actor and their roles **from the store** (not from props), check the current state, and write audit logs / custody events / notifications in the same call. Components never mutate the store directly; actions call services through `transact()`.
 4. **State transitions follow the state machine** in the plan. Each reservation/parcel transition writes exactly one custody event. `custodyEvents`, `auditLogs` and `ledger` are append-only: fix mistakes with new entries.
-5. **Host privacy:** exact addresses and coordinates live only in `hostPrivateDetails`. Customers see `publicLocation` (snapped by `snapToGrid`), never exact coordinates or exact distances.
+5. **Host privacy:** exact addresses and coordinates live only in `hostPrivateDetails`. Admins see them only on request (`viewPrivateDetails`, audited). Customers see `publicLocation` (snapped by `snapToGrid`), never exact coordinates or exact distances.
 6. **Secrets stay hashed:** passwords are stored as salted SHA-256 (`features/auth/password.ts`), pickup codes will be stored hashed. Never store or log plaintext.
 7. **Roles live on `User.roles`**, never chosen by the user (sign-up always creates a customer). Re-check roles in services.
 8. **Data minimization (GDPR mindset):** no ID documents, no IBAN, no label PII beyond what matching needs.
@@ -86,13 +86,14 @@ pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 
 - `/customer`, `/host`, `/admin` each use `<AppShell area="…">` in their `layout.tsx`. The shell (nav, top bar) is a static server component; the user menu and the page (inside `RoleGate`) are client-side.
 - Page files stay thin server components (metadata via `getTranslations`) that render a client component from `src/features/<domain>/components/`.
+- **Dynamic routes in an area** (e.g. `/admin/hosts/[hostId]`): read `params` inside `<Suspense>`. The shell already wraps its URL-reading parts (`AppNav`, `RoleGate`) in Suspense for this.
 - **Nav items** are defined once in `src/components/layout/AppShell/nav-config.ts` (max 5 per area, for the phone tab bar). Unbuilt sections render `<ComingSoon area section phase />`.
 - **Theme:** `useTheme()` (`src/lib/theme`), stored in localStorage and applied pre-paint by `themeInitScript` in `<head>`. `<html>`/`<body>` have `suppressHydrationWarning` for that script and for browser extensions.
 - Radix `asChild` needs exactly **one** child element. `DropdownMenuRadioItem` forbids `asChild`; for links in menus use `DropdownMenuItem asChild`.
 
 ## Conventions
 
-- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Select, Spinner, StatCard, Toast. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
+- **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Select, Spinner, StatCard, Textarea, Toast. Inside a `Field`, always use these controls (not raw `<input>`/`<textarea>`) so the label is linked. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
 - **Brand:** use `<Logo />` (inline SVG, `currentColor`, follows the theme), never the raw image. Source artwork is `docs/brand/logo.png`. App icons are `src/app/favicon.ico` (16/32/48), `icon.svg` and `apple-icon.png`, generated from the same traced path.
 - **Layout:** routes in `src/app/[locale]/{customer,host,admin}`. Domain logic in `src/features/<domain>/{service,selectors,actions,schemas}.ts` + `components/`. Shared UI in `src/components`.
 - **Money:** integer cents, EUR. **Time:** ISO strings in UTC, displayed in `Europe/Lisbon`.

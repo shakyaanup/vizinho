@@ -1,22 +1,12 @@
-import type { Page } from "@playwright/test";
-import { demoLogin, expect, signUp, test, visible } from "./fixtures";
-
-const section = (page: Page, name: string) =>
-  page.locator("section", { has: page.getByRole("heading", { name }) });
-
-/** A new customer with a saved listing and Monday evening hours. */
-async function startApplication(page: Page) {
-  await signUp(page, "Marta Ribeiro");
-  await page.goto("/customer/become-a-host");
-  const listing = section(page, "Your listing");
-  await listing.getByLabel("Listing name").fill("Marta in Arroios");
-  await listing.getByRole("button", { name: "Save listing" }).click();
-  await expect(listing.getByText("Listing saved.")).toBeVisible();
-  const hours = section(page, "Opening hours");
-  await hours.getByLabel("Open on Monday").check();
-  await hours.getByRole("button", { name: "Save opening hours" }).click();
-  await expect(hours.getByText("Opening hours saved.")).toBeVisible();
-}
+import {
+  demoLogin,
+  expect,
+  section,
+  signUp,
+  startHostApplication,
+  test,
+  visible,
+} from "./fixtures";
 
 test.describe("become a host", () => {
   test("listing and opening hours are validated and saved", async ({ page }) => {
@@ -91,7 +81,7 @@ test.describe("become a host", () => {
   });
 
   test("location by address search, then submit for review", async ({ page }) => {
-    await startApplication(page);
+    await startHostApplication(page);
     const location = section(page, "Location");
     await expect(location.getByRole("region", { name: /Map/ })).toBeVisible();
 
@@ -153,7 +143,7 @@ test.describe("become a host", () => {
     });
 
     test("'Use my current location' places the pin", async ({ page }) => {
-      await startApplication(page);
+      await startHostApplication(page);
       const location = section(page, "Location");
       await location.getByRole("button", { name: "Use my current location" }).click();
       await expect(location.locator('input[name="lat"]')).toHaveValue("38.73162");

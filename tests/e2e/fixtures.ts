@@ -116,3 +116,41 @@ export async function signUp(page: Page, fullName: string) {
   await page.waitForURL("/customer");
   return email;
 }
+
+/** The card section whose heading is `name` (forms on the host pages). */
+export const section = (page: Page, name: string) =>
+  page.locator("section", { has: page.getByRole("heading", { name }) });
+
+/** A new customer with a saved listing and Monday evening hours. */
+export async function startHostApplication(page: Page, displayName = "Marta in Arroios") {
+  const email = await signUp(page, "Marta Ribeiro");
+  await page.goto("/customer/become-a-host");
+  const listing = section(page, "Your listing");
+  await listing.getByLabel("Listing name").fill(displayName);
+  await listing.getByRole("button", { name: "Save listing" }).click();
+  await expect(listing.getByText("Listing saved.")).toBeVisible();
+  const hours = section(page, "Opening hours");
+  await hours.getByLabel("Open on Monday").check();
+  await hours.getByRole("button", { name: "Save opening hours" }).click();
+  await expect(hours.getByText("Opening hours saved.")).toBeVisible();
+  return email;
+}
+
+/** Places the pin with the (faked) address search and saves the location. */
+export async function saveLocationBySearch(page: Page) {
+  const location = section(page, "Location");
+  const search = location.getByRole("combobox", { name: "Search your address" });
+  await search.fill("Rua de Arroios 42");
+  await expect(location.getByRole("option")).toHaveCount(1);
+  await search.press("ArrowDown");
+  await search.press("Enter");
+  await location.getByRole("button", { name: "Save location" }).click();
+  await expect(location.getByText("Location saved.")).toBeVisible();
+}
+
+/** Logs out from the account menu in an app area. */
+export async function logOutFromMenu(page: Page) {
+  await page.getByRole("button", { name: "Account menu" }).click();
+  await page.getByRole("menuitem", { name: "Log out" }).click();
+  await page.waitForURL("/");
+}

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { idleState } from "@/lib/forms/form-state";
 import { saveListing } from "../actions";
 import { HOST_TYPES, PARCEL_SIZES, type ListingField } from "../schemas";
@@ -96,11 +97,10 @@ export function ListingForm({ defaults, editable }: ListingFormProps) {
           hint={t("listing.rulesTextHint")}
           error={fieldError("rulesText")}
         >
-          <textarea
+          <Textarea
             name="rulesText"
             rows={3}
             maxLength={1000}
-            className={styles.textarea}
             defaultValue={value("rulesText")}
           />
         </Field>

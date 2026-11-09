@@ -15,6 +15,7 @@ import {
   saveListing,
   saveLocation,
   submitApplication,
+  viewPrivateDetails,
 } from "./service";
 
 const listing: ListingInput = {
@@ -299,5 +300,34 @@ describe("saving the location", () => {
     completeApplication();
     submitApplication(db, hana.id, "2026-11");
     expectRule(() => saveLocation(db, hana.id, input), "locked");
+  });
+});
+
+describe("viewing a host's private address", () => {
+  it("is for admins only", () => {
+    expectRule(
+      () => viewPrivateDetails(db, DEMO_USER_IDS.customer, HUGO_HOST_ID),
+      "forbidden",
+    );
+    expectRule(
+      () => viewPrivateDetails(db, DEMO_USER_IDS.host, HUGO_HOST_ID),
+      "forbidden",
+    );
+  });
+
+  it("returns the address and records every view in the audit log", () => {
+    const details = viewPrivateDetails(db, ADMIN, HUGO_HOST_ID);
+    expect(details.addressLine1).toBe("Rua de Arroios 42");
+    viewPrivateDetails(db, ADMIN, HUGO_HOST_ID);
+    const views = db.auditLogs.filter(
+      (log) =>
+        log.action === "host.private_details_viewed" && log.targetId === HUGO_HOST_ID,
+    );
+    expect(views).toHaveLength(2);
+    expect(views[0]!.actorId).toBe(ADMIN);
+  });
+
+  it("refuses unknown hosts", () => {
+    expectRule(() => viewPrivateDetails(db, ADMIN, "missing"), "notFound");
   });
 });

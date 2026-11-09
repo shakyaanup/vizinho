@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/ui/Logo";
+import { Spinner } from "@/components/ui/Spinner";
 import { Link } from "@/i18n/navigation";
 import type { AppRole } from "@/lib/auth/roles";
-import { AppNav } from "./AppNav";
+import { AppNav, AppNavLinks } from "./AppNav";
 import { RoleGate } from "./RoleGate";
 import { UserMenu } from "./UserMenuClient";
 import styles from "./AppShell.module.scss";
@@ -29,7 +30,13 @@ export async function AppShell({ area, children }: AppShellProps) {
         </Link>
         <span className={styles.areaBadge}>{t(`areas.${area}`)}</span>
         <nav aria-label={t("mainNavigation")}>
-          <AppNav area={area} variant="sidebar" />
+          {/* Dynamic pages (e.g. /admin/hosts/[id]) only know their URL per
+              request, so URL-reading parts sit in Suspense. */}
+          <Suspense
+            fallback={<AppNavLinks area={area} variant="sidebar" pathname={null} />}
+          >
+            <AppNav area={area} variant="sidebar" />
+          </Suspense>
         </nav>
       </aside>
 
@@ -43,12 +50,22 @@ export async function AppShell({ area, children }: AppShellProps) {
         </header>
 
         <main id="main" className={styles.main}>
-          <RoleGate role={area}>{children}</RoleGate>
+          <Suspense
+            fallback={
+              <div className={styles.pageLoading}>
+                <Spinner size="lg" label={tShell("loadingPage")} />
+              </div>
+            }
+          >
+            <RoleGate role={area}>{children}</RoleGate>
+          </Suspense>
         </main>
       </div>
 
       <nav aria-label={t("mainNavigation")} className={styles.bottomNav}>
-        <AppNav area={area} variant="tabs" />
+        <Suspense fallback={<AppNavLinks area={area} variant="tabs" pathname={null} />}>
+          <AppNav area={area} variant="tabs" />
+        </Suspense>
       </nav>
     </div>
   );

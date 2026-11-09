@@ -13,9 +13,21 @@ type AppNavProps = {
   variant: "sidebar" | "tabs";
 };
 
-export function AppNav({ area, variant }: AppNavProps) {
+/** The nav, marking the current page. Reads the URL, so render it in <Suspense>. */
+export function AppNav(props: AppNavProps) {
+  return <AppNavLinks {...props} pathname={usePathname()} />;
+}
+
+/**
+ * The nav links themselves. With `pathname` null (the Suspense fallback on
+ * dynamic pages) nothing is marked current, so the layout doesn't shift.
+ */
+export function AppNavLinks({
+  area,
+  variant,
+  pathname,
+}: AppNavProps & { pathname: string | null }) {
   const t = useTranslations("Nav");
-  const pathname = usePathname();
 
   return (
     <ul
@@ -25,7 +37,7 @@ export function AppNav({ area, variant }: AppNavProps) {
       )}
     >
       {NAV_ITEMS[area].map((item) => {
-        const active = isNavItemActive(pathname, item);
+        const active = pathname !== null && isNavItemActive(pathname, item);
         const Icon = item.icon;
         return (
           <li key={item.href}>

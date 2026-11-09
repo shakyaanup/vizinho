@@ -1,7 +1,7 @@
 import { fieldErrorsFrom } from "@/lib/forms/form-state";
 import { DomainError } from "@/mocks/errors";
 import { getDemoState, transact } from "@/mocks/store";
-import type { DemoDb, Weekday } from "@/mocks/types";
+import type { DemoDb, HostPrivateDetails, HostStatus, Weekday } from "@/mocks/types";
 import type { HostingErrorCode, HostingFormState } from "./form-state";
 import {
   HOST_AGREEMENT_VERSION,
@@ -9,15 +9,18 @@ import {
   listingSchema,
   locationSchema,
   readHoursForm,
+  reviewSchema,
   submitSchema,
   type ListingField,
   type LocationField,
 } from "./schemas";
 import {
   replaceWeeklyHours,
+  reviewHost as reviewHostRule,
   saveLocation as saveLocationRule,
   saveListing as saveListingRule,
   submitApplication as submitRule,
+  viewPrivateDetails,
 } from "./service";
 
 // Form actions for useActionState. They validate with zod, then run the
@@ -142,4 +145,47 @@ export async function saveLocation(
     saveLocationRule(db, userId, parsed.data),
   );
   return error ? { status: "error", formError: error, values } : { status: "success" };
+}
+
+// --- Admin ----------------------------------------------------------------------
+
+export type ReviewState =
+  | { status: "idle" }
+  | { status: "error"; formError?: HostingErrorCode; noteError?: HostingErrorCode }
+  | { status: "success"; newStatus: HostStatus };
+
+/** Approve / reject / suspend / reinstate. The decision is the pressed button. */
+export async function reviewHost(
+  _prev: ReviewState,
+  formData: FormData,
+): Promise<ReviewState> {
+  const parsed = reviewSchema.safeParse({
+    hostId: formData.get("hostId"),
+    decision: formData.get("decision"),
+    note: String(formData.get("note") ?? ""),
+  });
+  if (!parsed.success) return { status: "error", formError: "unexpected" };
+
+  const { hostId, decision, note } = parsed.data;
+  let newStatus: HostStatus | undefined;
+  const error = runAsCurrentUser((db, userId) => {
+    newStatus = reviewHostRule(db, userId, hostId, decision, note);
+  });
+  if (error === "noteRequired" || error === "tooLong")
+    return { status: "error", noteError: error };
+  if (error || !newStatus) return { status: "error", formError: error ?? "unexpected" };
+  return { status: "success", newStatus };
+}
+
+/** Reveals a host's private address to an admin, writing an audit entry. */
+export function revealPrivateDetails(
+  hostId: string,
+): { ok: true; details: HostPrivateDetails } | { ok: false; error: HostingErrorCode } {
+  let details: HostPrivateDetails | undefined;
+  const error = runAsCurrentUser((db, userId) => {
+    details = viewPrivateDetails(db, userId, hostId);
+  });
+  return error || !details
+    ? { ok: false, error: error ?? "unexpected" }
+    : { ok: true, details };
 }
