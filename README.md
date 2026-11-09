@@ -20,7 +20,7 @@ Run it locally (below) and press **Try as customer / host / admin** on the home 
 | -------- | --------------------------- | -------------------------------------------------------------------- |
 | Customer | `customer@demo.vizinho.app` | Active reservations, "Become a host" application                     |
 | Host     | `host@demo.vizinho.app`     | Pending request, parcel in storage, listing details, switching areas |
-| Admin    | `admin@demo.vizinho.app`    | Platform overview: hosts awaiting review, open incidents             |
+| Admin    | `admin@demo.vizinho.app`    | Review the 2 waiting host applications, platform overview            |
 
 You can also create your own account. Everything you do is saved in your browser only; **Reset demo data** on the account page restores the original data.
 
