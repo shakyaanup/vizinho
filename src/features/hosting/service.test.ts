@@ -8,13 +8,18 @@ import {
 } from "@/mocks/seed";
 import type { DemoDb, User } from "@/mocks/types";
 import type { ListingInput, LocationInput } from "./schemas";
+import { upcomingTimeOff } from "./selectors";
 import {
+  addTimeOff,
   applicationChecklist,
+  removeTimeOff,
   replaceWeeklyHours,
   reviewHost,
   saveListing,
   saveLocation,
+  setPaused,
   submitApplication,
+  TIME_OFF_LIMITS,
   viewPrivateDetails,
 } from "./service";
 
@@ -329,5 +334,166 @@ describe("viewing a host's private address", () => {
 
   it("refuses unknown hosts", () => {
     expectRule(() => viewPrivateDetails(db, ADMIN, "missing"), "notFound");
+  });
+});
+
+describe("host settings", () => {
+  const NOW = new Date("2026-11-07T10:00:00Z");
+  const HUGO = DEMO_USER_IDS.host;
+  const MARTA = ownerId(1); // approved, no reservations
+  const CATARINA = ownerId(8); // away 12–18 November in the seed
+  const VASCO = ownerId(20); // suspended
+  const away = (startDate: string, endDate: string, reason: string | null = null) => ({
+    startDate,
+    endDate,
+    reason,
+  });
+  const lisbon: LocationInput = {
+    addressLine1: "Rua de São Miguel 14",
+    addressLine2: null,
+    postalCode: "1100-544",
+    city: "Lisboa",
+    areaLabel: "Alfama, Lisboa",
+    accessInstructions: null,
+    lng: -9.1301,
+    lat: 38.7116,
+  };
+
+  it("lets an approved host edit their live listing and hours", () => {
+    const host = saveListing(db, MARTA, { ...listing, displayName: "Marta, Alfama" });
+    expect(host).toMatchObject({ status: "approved", displayName: "Marta, Alfama" });
+    replaceWeeklyHours(db, MARTA, [{ weekday: 6, opensAt: "10:00", closesAt: "13:00" }]);
+    expect(db.weeklyHours.filter((slot) => slot.hostId === host.id)).toHaveLength(1);
+  });
+
+  it("locks a suspended listing", () => {
+    expectRule(() => saveListing(db, VASCO, listing), "suspended");
+    expectRule(() => replaceWeeklyHours(db, VASCO, []), "suspended");
+    expectRule(() => saveLocation(db, VASCO, lisbon), "suspended");
+    expectRule(() => setPaused(db, VASCO, true), "suspended");
+    expectRule(
+      () => addTimeOff(db, VASCO, away("2026-12-01", "2026-12-02"), NOW),
+      "suspended",
+    );
+  });
+
+  it("audits a live host's move, logging only the public points", () => {
+    const before = db.hosts.find((h) => h.id === mockHostId(1))!.publicLocation;
+    saveLocation(db, MARTA, lisbon);
+    const log = db.auditLogs.find((l) => l.action === "host.location_changed");
+    expect(log).toMatchObject({ actorId: MARTA, targetId: mockHostId(1) });
+    expect(log!.details).toEqual({ from: before, to: expect.any(Object) });
+    expect(JSON.stringify(log!.details)).not.toContain("São Miguel");
+  });
+
+  it("won't move a host with accepted reservations or parcels in storage", () => {
+    // Hugo is holding Rui's parcel.
+    expectRule(
+      () => saveLocation(db, HUGO, { ...lisbon, areaLabel: "Arroios" }),
+      "activeReservations",
+    );
+  });
+
+  it("pauses and resumes an approved listing", () => {
+    expect(setPaused(db, MARTA, true).isPaused).toBe(true);
+    expect(setPaused(db, MARTA, false).isPaused).toBe(false);
+  });
+
+  it("only lets approved hosts pause or plan time off", () => {
+    saveListing(db, hana.id, listing); // a draft
+    expectRule(() => setPaused(db, hana.id, true), "notApproved");
+    expectRule(
+      () => addTimeOff(db, hana.id, away("2026-12-01", "2026-12-02"), NOW),
+      "notApproved",
+    );
+    expectRule(() => setPaused(db, DEMO_USER_IDS.customer, true), "noListing");
+  });
+
+  it("stores whole Lisbon days and lists them back", () => {
+    // Winter days start at 00:00 UTC; summer days at 23:00 UTC the day before.
+    const entry = addTimeOff(
+      db,
+      MARTA,
+      away("2026-12-24", "2026-12-26", "Christmas"),
+      NOW,
+    );
+    expect(entry).toMatchObject({
+      startsAt: "2026-12-24T00:00:00.000Z",
+      endsAt: "2026-12-27T00:00:00.000Z",
+      reason: "Christmas",
+    });
+    const summer = addTimeOff(db, MARTA, away("2027-07-01", "2027-07-02"), NOW);
+    expect(summer.startsAt).toBe("2027-06-30T23:00:00.000Z");
+
+    expect(
+      upcomingTimeOff(db, mockHostId(1), NOW).map((t) => [t.firstDay, t.lastDay]),
+    ).toEqual([
+      ["2026-12-24", "2026-12-26"],
+      ["2027-07-01", "2027-07-02"],
+    ]);
+  });
+
+  it("accepts a single day starting today", () => {
+    expect(addTimeOff(db, MARTA, away("2026-11-07", "2026-11-07"), NOW).endsAt).toBe(
+      "2026-11-08T00:00:00.000Z",
+    );
+  });
+
+  it("refuses periods in the past, backwards, too long or too far ahead", () => {
+    expectRule(
+      () => addTimeOff(db, MARTA, away("2026-11-06", "2026-11-08"), NOW),
+      "inPast",
+    );
+    expectRule(
+      () => addTimeOff(db, MARTA, away("2026-12-10", "2026-12-01"), NOW),
+      "endBeforeStart",
+    );
+    // 61 days is refused; exactly 60 (1 December to 29 January) is fine.
+    expectRule(
+      () => addTimeOff(db, MARTA, away("2026-12-01", "2027-01-30"), NOW),
+      "timeOffTooLong",
+    );
+    expect(addTimeOff(db, MARTA, away("2026-12-01", "2027-01-29"), NOW)).toBeTruthy();
+    expectRule(
+      () => addTimeOff(db, MARTA, away("2027-11-09", "2027-11-10"), NOW),
+      "tooFarAhead",
+    );
+  });
+
+  it("refuses overlapping periods", () => {
+    // Catarina is away 12–18 November.
+    expectRule(
+      () => addTimeOff(db, CATARINA, away("2026-11-18", "2026-11-20"), NOW),
+      "overlaps",
+    );
+    // The day after her last day is free.
+    expect(addTimeOff(db, CATARINA, away("2026-11-19", "2026-11-20"), NOW)).toBeTruthy();
+  });
+
+  it("refuses days with a parcel the host agreed (or was asked) to receive", () => {
+    // Carla asked Hugo to receive a parcel on 10 November.
+    expectRule(
+      () => addTimeOff(db, HUGO, away("2026-11-09", "2026-11-11"), NOW),
+      "reservationsInPeriod",
+    );
+    expect(addTimeOff(db, HUGO, away("2026-11-11", "2026-11-12"), NOW)).toBeTruthy();
+  });
+
+  it("caps the number of upcoming periods", () => {
+    for (let i = 0; i < TIME_OFF_LIMITS.maxUpcoming; i++) {
+      const day = `2026-12-${String(i * 2 + 1).padStart(2, "0")}`;
+      addTimeOff(db, MARTA, away(day, day), NOW);
+    }
+    expectRule(
+      () => addTimeOff(db, MARTA, away("2026-12-31", "2026-12-31"), NOW),
+      "tooManyTimeOff",
+    );
+  });
+
+  it("removes only the host's own periods", () => {
+    const entry = addTimeOff(db, MARTA, away("2026-12-01", "2026-12-02"), NOW);
+    expectRule(() => removeTimeOff(db, CATARINA, entry.id), "notFound");
+    removeTimeOff(db, MARTA, entry.id);
+    expect(db.timeOff.some((t) => t.id === entry.id)).toBe(false);
   });
 });

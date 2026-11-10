@@ -1,6 +1,6 @@
 # Vizinho — Development Plan (v0.1, for review)
 
-Status: **APPROVED (with the changes in §0). Phase 1 complete (2026-11-05). Frontend-only since 2026-11-07. Phase 2 in progress.**
+Status: **APPROVED (with the changes in §0). Phase 1 complete (2026-11-05). Frontend-only since 2026-11-07. Phase 2 complete (2026-11-10).**
 
 > **Architecture change, 2026-11-07 ([ADR 0003](adr/0003-frontend-only-with-mock-data.md)).** The project is now **frontend-only**: no Supabase, no database, no Docker. Data is mock data in the browser (`src/mocks/`), and the business rules that were Postgres functions and RLS policies are TypeScript services with the same rules. Sections §6–§8 below describe the original backend design; they're kept as the blueprint for a future real backend, and where they mention tables, RLS or RPCs, read "the `DemoDb` collections and services" instead.
 > Source: `docs/VIZINHO_PROJECT_BRIEF.md` (`docs/conversation.md` was referenced but does not exist in the repo).
@@ -305,7 +305,9 @@ Location snapping already exists (Phase 1 trigger), and the `public_hosts` view 
 2. **"Become a host" form** ✅ in the customer area: type and name, rules and limits, opening hours, agreement, with a live checklist. The location section waits for Step 3.
 3. **Location picker** ✅: MapLibre + OpenFreeMap with an Uber-style fixed centre pin, Photon address search (accessible combobox), "use my current location", and a shaded preview of the grid cell customers see. Saving stores the exact point privately and publishes only the snapped pin. Phase 3's discovery map reuses `LocationMap`.
 4. **Admin approval queue** ✅: `/admin/hosts` lists hosts by status (waiting applications oldest first, with counts); `/admin/hosts/[id]` shows the listing, owner, hours and history, reveals the private address and exact map pin only on request (each view audited), and offers only the decisions valid from the current state (a note is required to reject or suspend; admins can't decide on their own listing).
-5. **Host settings:** edit the listing, hours, time off and pause; e2e tests; docs.
+5. **Host settings** ✅: `/host/listing` (edit the live listing and location; no move while the host has accepted reservations or parcels in storage; moves are audited with the public points only) and `/host/schedule` (pause new requests, weekly hours, time off). Time off is whole Lisbon days, up to 60 days, starting today to a year ahead, at most 10 upcoming, no overlaps, and not on a day a requested or accepted parcel is due. Pause and time off need an approved listing; a suspended listing is read-only.
+
+> **Done 2026-11-10.** Tests: 133 unit, 34 Playwright.
 
 ### Phase 3: Discovery and reservations
 

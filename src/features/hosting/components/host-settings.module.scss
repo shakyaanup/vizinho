@@ -1,0 +1,97 @@
+@use "styles/tokens" as *;
+@use "styles/mixins" as *;
+
+.stack {
+  display: grid;
+  gap: $space-5;
+  max-width: 44rem;
+}
+
+.title {
+  margin: 0;
+  font-size: $font-size-lg;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-3;
+  align-items: center;
+}
+
+.intro {
+  margin: $space-2 0 $space-5;
+  color: var(--color-text-muted);
+}
+
+.status {
+  margin: $space-2 0 $space-4;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  align-items: center;
+}
+
+.done {
+  margin: 0;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-success);
+}
+
+// ---------- Time off ----------
+.periods {
+  display: grid;
+  padding: 0;
+  margin: 0 0 $space-5;
+  list-style: none;
+}
+
+.period {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-3;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-3 0;
+  border-bottom: $border-width solid var(--color-border);
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.periodText {
+  display: grid;
+  gap: $space-1;
+}
+
+.periodRange {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  align-items: center;
+  font-weight: $font-weight-semibold;
+}
+
+.periodReason {
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0 0 $space-5;
+  color: var(--color-text-muted);
+}
+
+.addTitle {
+  margin: 0;
+  font-size: $font-size-base;
+}

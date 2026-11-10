@@ -161,7 +161,9 @@
       "openingSlotsValue": "{count, plural, =0 {Not set} one {# weekly slot} other {# weekly slots}}",
       "pendingTitle": "Requests waiting",
       "storedTitle": "Parcels in storage",
-      "noListing": "You don't have a host listing yet."
+      "noListing": "You don't have a host listing yet.",
+      "editListing": "Edit listing",
+      "manageSchedule": "Schedule and time off"
     },
     "admin": {
       "subtitle": "Platform health at a glance.",
@@ -334,7 +336,61 @@
       "city": "Enter the city.",
       "areaLabel": "Enter your neighbourhood (2–80 characters).",
       "locationRequired": "Place the pin on your door: search for your address or move the map.",
-      "outsidePortugal": "Vizinho hosts must be in mainland Portugal."
+      "outsidePortugal": "Vizinho hosts must be in mainland Portugal.",
+      "suspended": "Your listing is suspended, so it can't be changed.",
+      "activeReservations": "You have accepted reservations or parcels in storage. Change your address once they're collected.",
+      "notApproved": "Only approved hosts can do this.",
+      "date": "Enter a valid date.",
+      "endBeforeStart": "The last day can't be before the first day.",
+      "inPast": "Time off can't start in the past.",
+      "timeOffTooLong": "Time off can last up to 60 days.",
+      "tooFarAhead": "You can plan time off up to a year ahead.",
+      "overlaps": "This overlaps time off you've already planned.",
+      "reservationsInPeriod": "A parcel is due on one of those days (requested or accepted). Choose other days.",
+      "tooManyTimeOff": "You can plan up to 10 periods of time off."
+    }
+  },
+  "HostSettings": {
+    "scheduleTitle": "Schedule",
+    "scheduleSubtitle": "When customers can book you and collect their parcels.",
+    "listingTitle": "Your listing",
+    "listingSubtitle": "What customers see about you, and where you are.",
+    "suspendedTitle": "Your listing is suspended",
+    "suspendedBody": "You can't change it while it's suspended. Parcels you hold can still be collected.",
+    "reviewNote": "Note from the admin: {note}",
+    "noListing": "You don't have a host listing yet.",
+    "details": "Listing details",
+    "detailsIntro": "Changes show to customers straight away.",
+    "location": "Location",
+    "locationIntro": "Moved? Update your pin. You can't move while customers have accepted reservations or parcels waiting with you.",
+    "pause": {
+      "title": "New requests",
+      "pausedBadge": "Paused",
+      "open": "Open: customers can send you new requests.",
+      "paused": "Paused: customers can't send you new requests. Reservations you've already accepted carry on as normal.",
+      "pause": "Pause new requests",
+      "resume": "Resume new requests",
+      "pausedDone": "New requests paused.",
+      "resumedDone": "New requests resumed."
+    },
+    "hours": {
+      "title": "Opening hours"
+    },
+    "timeOff": {
+      "title": "Time off",
+      "intro": "Days you're away. Customers can't choose a delivery date on these days. Up to 60 days at a time.",
+      "listLabel": "Planned time off",
+      "empty": "No time off planned.",
+      "now": "Away now",
+      "remove": "Remove",
+      "removeLabel": "Remove time off: {range}",
+      "removed": "Time off removed.",
+      "startDate": "First day away",
+      "endDate": "Last day away",
+      "reason": "Note (optional)",
+      "reasonHint": "For your own reference, e.g. “Holiday”.",
+      "add": "Add time off",
+      "added": "Time off added."
     }
   },
   "Demo": {

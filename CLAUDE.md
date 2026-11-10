@@ -12,7 +12,7 @@ Portugal-first P2P parcel pickup platform. Verified hosts (neighbors/shops) rece
 
 ## Current status
 
-**Phase 1 complete.** **Phase 2 in progress** (host onboarding and admin approval, steps in plan §9): the move to frontend-only is done, Step 1 (host review rules, now in `src/features/hosting/service.ts`) is done, and Steps 2–4 (the "Become a host" form with the map location picker, and the admin approval queue) are built. **Next: Step 5, host settings (edit listing, hours, time off, pause).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
+**Phases 1 and 2 complete** (Phase 2: host review rules, the "Become a host" form with the map location picker, the admin approval queue, and host settings at `/host/listing` and `/host/schedule`). **Waiting for the owner's end-of-phase review; next is Phase 3 (discovery and reservations).** Implement one phase at a time (plan §9) and stop for review at the end of each phase.
 
 ## Working agreement with the owner (always do these)
 
@@ -96,7 +96,7 @@ pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 - **UI kit:** `src/components/ui/` has Alert, Avatar, Badge, Button, Card, Dialog, DropdownMenu, EmptyState, Field, Input, Logo, PasswordInput, Select, Spinner, StatCard, Textarea, Toast. Inside a `Field`, always use these controls (not raw `<input>`/`<textarea>`) so the label is linked. Layout pieces live in `src/components/layout/` (AppShell, PageHeader, ComingSoon, LocaleSwitcher). Check there before building new UI, and preview everything at `/styleguide`. Components never hard-code user-facing text. Accessible labels (e.g. `closeLabel`) are props so callers pass translated strings.
 - **Brand:** use `<Logo />` (inline SVG, `currentColor`, follows the theme), never the raw image. Source artwork is `docs/brand/logo.png`. App icons are `src/app/favicon.ico` (16/32/48), `icon.svg` and `apple-icon.png`, generated from the same traced path.
 - **Layout:** routes in `src/app/[locale]/{customer,host,admin}`. Domain logic in `src/features/<domain>/{service,selectors,actions,schemas}.ts` + `components/`. Shared UI in `src/components`.
-- **Money:** integer cents, EUR. **Time:** ISO strings in UTC, displayed in `Europe/Lisbon`.
+- **Money:** integer cents, EUR. **Time:** ISO strings in UTC, displayed in `Europe/Lisbon`. Whole-day periods (time off) use `src/lib/time/lisbon.ts`: stored as `[Lisbon midnight of the first day, Lisbon midnight after the last day)`.
 - **Styling:** never Tailwind. Each component is a folder: `Component.tsx` + `Component.module.scss` + `index.ts`. Use tokens from `src/styles/` (`@use "styles/tokens" as *;`, resolved via `sassOptions.loadPaths`), not raw hex/px values. Stylelint forbids hex colors outside the token/theme files. Class names are camelCase. Theme colors are CSS custom properties so light/dark switching works. Write mobile-first media queries via the `respond-to()` mixin.
 - **i18n:** no hard-coded user-facing strings. Add keys to both `src/messages/en.json` and `src/messages/pt-PT.json` (European Portuguese). A unit test fails if the key sets or `{placeholders}` differ.
 - **Accessibility:** WCAG 2.2 AA, semantic HTML, labelled inputs, visible focus, 44px touch targets, no color-only status. Mobile-first: design at 360px width first.

@@ -1,13 +1,15 @@
 "use client";
 
-import { Boxes, Inbox, Store } from "lucide-react";
+import { Boxes, CalendarClock, Inbox, Pencil, Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatCard } from "@/components/ui/StatCard";
+import { Link } from "@/i18n/navigation";
 import { useCurrentUser } from "@/lib/auth/session";
 import { useDemoState } from "@/mocks/store";
 import type { HostStatus } from "@/mocks/types";
@@ -85,6 +87,18 @@ export function HostHome() {
             <dt>{t("host.openingSlots")}</dt>
             <dd>{t("host.openingSlotsValue", { count: data.openingSlots })}</dd>
           </dl>
+          <div className={styles.cardActions}>
+            <Button asChild variant="secondary">
+              <Link href="/host/listing">
+                <Pencil aria-hidden /> {t("host.editListing")}
+              </Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link href="/host/schedule">
+                <CalendarClock aria-hidden /> {t("host.manageSchedule")}
+              </Link>
+            </Button>
+          </div>
         </Card>
       </div>
     </>

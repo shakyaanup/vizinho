@@ -1,7 +1,12 @@
-import { ComingSoon, comingSoonMetadata } from "@/components/layout/ComingSoon";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { HostSchedule } from "@/features/hosting/components/HostSchedule";
 
-export const generateMetadata = comingSoonMetadata("host", "schedule");
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("HostSettings");
+  return { title: t("scheduleTitle") };
+}
 
 export default function Page() {
-  return <ComingSoon area="host" section="schedule" phase={2} />;
+  return <HostSchedule />;
 }

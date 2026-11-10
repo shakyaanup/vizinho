@@ -11,14 +11,19 @@ import {
   readHoursForm,
   reviewSchema,
   submitSchema,
+  timeOffSchema,
   type ListingField,
   type LocationField,
+  type TimeOffField,
 } from "./schemas";
 import {
+  addTimeOff as addTimeOffRule,
+  removeTimeOff as removeTimeOffRule,
   replaceWeeklyHours,
   reviewHost as reviewHostRule,
   saveLocation as saveLocationRule,
   saveListing as saveListingRule,
+  setPaused as setPausedRule,
   submitApplication as submitRule,
   viewPrivateDetails,
 } from "./service";
@@ -145,6 +150,44 @@ export async function saveLocation(
     saveLocationRule(db, userId, parsed.data),
   );
   return error ? { status: "error", formError: error, values } : { status: "success" };
+}
+
+// --- Host settings --------------------------------------------------------------
+
+/** One-click actions (no form fields) report success or an error code. */
+export type ActionResult = { ok: true } | { ok: false; error: HostingErrorCode };
+
+const toResult = (error: HostingErrorCode | null): ActionResult =>
+  error ? { ok: false, error } : { ok: true };
+
+/** Pauses or resumes new requests for the caller's listing. */
+export function setPaused(paused: boolean): ActionResult {
+  return toResult(runAsCurrentUser((db, userId) => setPausedRule(db, userId, paused)));
+}
+
+const TIME_OFF_FIELDS: TimeOffField[] = ["startDate", "endDate", "reason"];
+
+export async function addTimeOff(
+  _prev: HostingFormState<TimeOffField>,
+  formData: FormData,
+): Promise<HostingFormState<TimeOffField>> {
+  const values = Object.fromEntries(
+    TIME_OFF_FIELDS.map((field) => [field, String(formData.get(field) ?? "")]),
+  ) as Record<TimeOffField, string>;
+
+  const parsed = timeOffSchema.safeParse(values);
+  if (!parsed.success) {
+    return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), values };
+  }
+
+  const error = runAsCurrentUser((db, userId) => addTimeOffRule(db, userId, parsed.data));
+  return error ? { status: "error", formError: error, values } : { status: "success" };
+}
+
+export function removeTimeOff(timeOffId: string): ActionResult {
+  return toResult(
+    runAsCurrentUser((db, userId) => removeTimeOffRule(db, userId, timeOffId)),
+  );
 }
 
 // --- Admin ----------------------------------------------------------------------

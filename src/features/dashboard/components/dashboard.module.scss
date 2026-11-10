@@ -40,6 +40,13 @@
   margin-top: $space-4;
 }
 
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-5;
+}
+
 .details {
   display: grid;
   grid-template-columns: auto 1fr;

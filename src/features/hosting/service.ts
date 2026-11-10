@@ -6,9 +6,10 @@ import type {
   HostStatus,
   Weekday,
 } from "@/mocks/types";
+import { addDays, daysBetween, lisbonDate, lisbonMidnight } from "@/lib/time/lisbon";
 import type { HostingErrorCode } from "./form-state";
 import { isInPortugal, snapToGrid } from "./location";
-import type { HoursInput, ListingInput, LocationInput } from "./schemas";
+import type { HoursInput, ListingInput, LocationInput, TimeOffInput } from "./schemas";
 
 // Host application rules. These were Postgres functions and RLS policies in
 // the original backend design (docs/adr/0001); they keep the same rules here
@@ -25,9 +26,18 @@ const fail = (code: HostingErrorCode): never => {
 const ownListing = (db: DemoDb, userId: string) =>
   db.hosts.find((host) => host.userId === userId);
 
-/** Applicants can edit a draft or a rejected application, never one in review. */
+/**
+ * Who can change a listing: applicants with a draft or rejected application,
+ * and approved hosts. Never while an admin is reviewing it, and never while
+ * it is suspended (the admin's decision covers the listing as it was).
+ */
 export const isEditable = (host: Pick<HostProfile, "status">) =>
-  host.status !== "pending_review";
+  host.status !== "pending_review" && host.status !== "suspended";
+
+function assertEditable(host: HostProfile) {
+  if (host.status === "pending_review") fail("locked");
+  if (host.status === "suspended") fail("suspended");
+}
 
 function audit(
   db: DemoDb,
@@ -84,7 +94,7 @@ export function saveListing(
 
   const existing = ownListing(db, userId);
   if (existing) {
-    if (!isEditable(existing)) fail("locked");
+    assertEditable(existing);
     Object.assign(existing, fields, { updatedAt: now });
     return existing;
   }
@@ -113,7 +123,7 @@ export function saveListing(
 /** Replaces the caller's whole weekly schedule (all or nothing). */
 export function replaceWeeklyHours(db: DemoDb, userId: string, slots: HoursInput) {
   const host = ownListing(db, userId) ?? fail("noListing");
-  if (!isEditable(host)) fail("locked");
+  assertEditable(host);
   if (slots.some((slot) => slot.closesAt <= slot.opensAt)) fail("closesBeforeOpens");
 
   db.weeklyHours = db.weeklyHours.filter((slot) => slot.hostId !== host.id);
@@ -134,10 +144,24 @@ export function replaceWeeklyHours(db: DemoDb, userId: string, slots: HoursInput
  */
 export function saveLocation(db: DemoDb, userId: string, input: LocationInput) {
   const host = ownListing(db, userId) ?? fail("noListing");
-  if (!isEditable(host)) fail("locked");
+  assertEditable(host);
 
   const exactLocation = { lng: input.lng, lat: input.lat };
   if (!isInPortugal(exactLocation)) fail("outsidePortugal");
+
+  // A live host may move, but not while customers have been given (or are
+  // about to need) the current address: an accepted reservation or a parcel
+  // waiting in storage.
+  const live = host.status === "approved";
+  if (
+    live &&
+    db.reservations.some(
+      (r) =>
+        r.hostId === host.id &&
+        (r.status === "accepted" || r.status === "awaiting_pickup"),
+    )
+  )
+    fail("activeReservations");
 
   const details = {
     hostId: host.id,
@@ -152,11 +176,19 @@ export function saveLocation(db: DemoDb, userId: string, input: LocationInput) {
   if (index === -1) db.hostPrivateDetails.push(details);
   else db.hostPrivateDetails[index] = details;
 
+  const from = host.publicLocation;
   Object.assign(host, {
     areaLabel: input.areaLabel,
     publicLocation: snapToGrid(exactLocation),
     updatedAt: new Date().toISOString(),
   });
+  // Admins approved a place; a live host moving is worth a trace. Only the
+  // public (snapped) points are logged, never the exact address.
+  if (live)
+    audit(db, userId, "host.location_changed", host.id, {
+      from,
+      to: host.publicLocation,
+    });
   return host;
 }
 
@@ -297,4 +329,99 @@ export function viewPrivateDetails(db: DemoDb, adminId: string, hostId: string) 
     db.hostPrivateDetails.find((d) => d.hostId === hostId) ?? fail("notFound");
   audit(db, adminId, "host.private_details_viewed", hostId, {});
   return details;
+}
+
+// --- Host settings (approved hosts) ---------------------------------------------
+
+function liveListing(db: DemoDb, userId: string) {
+  const host = ownListing(db, userId) ?? fail("noListing");
+  if (host.status === "suspended") fail("suspended");
+  if (host.status !== "approved") fail("notApproved");
+  return host;
+}
+
+/**
+ * Pausing hides the listing from new requests. It's the host's own switch
+ * (no audit), and it never touches reservations already made: those parcels
+ * still arrive and still need collecting.
+ */
+export function setPaused(db: DemoDb, userId: string, paused: boolean) {
+  const host = liveListing(db, userId);
+  if (host.isPaused !== paused) {
+    Object.assign(host, { isPaused: paused, updatedAt: new Date().toISOString() });
+  }
+  return host;
+}
+
+export const TIME_OFF_LIMITS = {
+  /** Longest single period, in days. */
+  maxDays: 60,
+  /** How far ahead a period may start, in days. */
+  maxAheadDays: 365,
+  /** Upcoming periods at once. */
+  maxUpcoming: 10,
+} as const;
+
+/**
+ * Adds a period away, in whole Lisbon days (first and last day inclusive).
+ * Stored as [startsAt, endsAt) instants: Lisbon midnight of the first day to
+ * Lisbon midnight after the last day.
+ */
+export function addTimeOff(
+  db: DemoDb,
+  userId: string,
+  input: TimeOffInput,
+  now: Date = new Date(),
+) {
+  const host = liveListing(db, userId);
+  const { startDate, endDate } = input;
+  const today = lisbonDate(now);
+
+  if (endDate < startDate) fail("endBeforeStart");
+  if (startDate < today) fail("inPast");
+  if (daysBetween(today, startDate) > TIME_OFF_LIMITS.maxAheadDays) fail("tooFarAhead");
+  if (daysBetween(startDate, endDate) + 1 > TIME_OFF_LIMITS.maxDays)
+    fail("timeOffTooLong");
+
+  const startsAt = lisbonMidnight(startDate);
+  const endsAt = lisbonMidnight(addDays(endDate, 1));
+  const own = db.timeOff.filter((t) => t.hostId === host.id);
+
+  if (own.some((t) => t.startsAt < endsAt && startsAt < t.endsAt)) fail("overlaps");
+  if (
+    own.filter((t) => t.endsAt > now.toISOString()).length >= TIME_OFF_LIMITS.maxUpcoming
+  )
+    fail("tooManyTimeOff");
+
+  // A host can't promise to receive a parcel and then be away that day.
+  // Cancel or decline those first.
+  if (
+    db.reservations.some(
+      (r) =>
+        r.hostId === host.id &&
+        (r.status === "requested" || r.status === "accepted") &&
+        r.expectedDeliveryDate >= startDate &&
+        r.expectedDeliveryDate <= endDate,
+    )
+  )
+    fail("reservationsInPeriod");
+
+  const entry = {
+    id: crypto.randomUUID(),
+    hostId: host.id,
+    startsAt,
+    endsAt,
+    reason: input.reason,
+  };
+  db.timeOff.push(entry);
+  return entry;
+}
+
+/** Removes one of the caller's own periods away. */
+export function removeTimeOff(db: DemoDb, userId: string, timeOffId: string) {
+  const host = ownListing(db, userId) ?? fail("noListing");
+  const index = db.timeOff.findIndex((t) => t.id === timeOffId && t.hostId === host.id);
+  // Someone else's entry looks exactly like a missing one.
+  if (index === -1) fail("notFound");
+  db.timeOff.splice(index, 1);
 }

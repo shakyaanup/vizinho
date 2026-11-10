@@ -161,7 +161,9 @@
       "openingSlotsValue": "{count, plural, =0 {Não definido} one {# período semanal} other {# períodos semanais}}",
       "pendingTitle": "Pedidos pendentes",
       "storedTitle": "Encomendas em armazém",
-      "noListing": "Ainda não tem um anúncio de anfitrião."
+      "noListing": "Ainda não tem um anúncio de anfitrião.",
+      "editListing": "Editar anúncio",
+      "manageSchedule": "Horário e ausências"
     },
     "admin": {
       "subtitle": "O estado da plataforma num relance.",
@@ -334,7 +336,61 @@
       "city": "Indique a localidade.",
       "areaLabel": "Indique o seu bairro (2–80 caracteres).",
       "locationRequired": "Coloque o marcador na sua porta: pesquise a morada ou mova o mapa.",
-      "outsidePortugal": "Os anfitriões Vizinho têm de estar em Portugal continental."
+      "outsidePortugal": "Os anfitriões Vizinho têm de estar em Portugal continental.",
+      "suspended": "O seu anúncio está suspenso e não pode ser alterado.",
+      "activeReservations": "Tem reservas aceites ou encomendas guardadas. Altere a morada depois de serem levantadas.",
+      "notApproved": "Só anfitriões aprovados podem fazer isto.",
+      "date": "Indique uma data válida.",
+      "endBeforeStart": "O último dia não pode ser anterior ao primeiro.",
+      "inPast": "Uma ausência não pode começar no passado.",
+      "timeOffTooLong": "Uma ausência pode durar até 60 dias.",
+      "tooFarAhead": "Pode planear ausências até um ano de antecedência.",
+      "overlaps": "Sobrepõe-se a uma ausência que já planeou.",
+      "reservationsInPeriod": "Há uma encomenda prevista para um desses dias (pedida ou aceite). Escolha outros dias.",
+      "tooManyTimeOff": "Pode planear até 10 ausências."
+    }
+  },
+  "HostSettings": {
+    "scheduleTitle": "Horário",
+    "scheduleSubtitle": "Quando os clientes o podem reservar e levantar as encomendas.",
+    "listingTitle": "O seu anúncio",
+    "listingSubtitle": "O que os clientes veem sobre si e onde está.",
+    "suspendedTitle": "O seu anúncio está suspenso",
+    "suspendedBody": "Não o pode alterar enquanto estiver suspenso. As encomendas que guarda ainda podem ser levantadas.",
+    "reviewNote": "Nota do administrador: {note}",
+    "noListing": "Ainda não tem um anúncio de anfitrião.",
+    "details": "Dados do anúncio",
+    "detailsIntro": "As alterações ficam visíveis para os clientes de imediato.",
+    "location": "Localização",
+    "locationIntro": "Mudou de casa? Atualize o marcador. Não pode mudar enquanto tiver reservas aceites ou encomendas à sua guarda.",
+    "pause": {
+      "title": "Novos pedidos",
+      "pausedBadge": "Em pausa",
+      "open": "Aberto: os clientes podem enviar-lhe novos pedidos.",
+      "paused": "Em pausa: os clientes não podem enviar-lhe novos pedidos. As reservas que já aceitou continuam normalmente.",
+      "pause": "Pausar novos pedidos",
+      "resume": "Retomar novos pedidos",
+      "pausedDone": "Novos pedidos em pausa.",
+      "resumedDone": "Novos pedidos retomados."
+    },
+    "hours": {
+      "title": "Horário de abertura"
+    },
+    "timeOff": {
+      "title": "Ausências",
+      "intro": "Dias em que está fora. Os clientes não podem escolher esses dias para a entrega. Até 60 dias de cada vez.",
+      "listLabel": "Ausências planeadas",
+      "empty": "Não tem ausências planeadas.",
+      "now": "Ausente agora",
+      "remove": "Remover",
+      "removeLabel": "Remover ausência: {range}",
+      "removed": "Ausência removida.",
+      "startDate": "Primeiro dia fora",
+      "endDate": "Último dia fora",
+      "reason": "Nota (opcional)",
+      "reasonHint": "Só para si, por exemplo “Férias”.",
+      "add": "Adicionar ausência",
+      "added": "Ausência adicionada."
     }
   },
   "Demo": {

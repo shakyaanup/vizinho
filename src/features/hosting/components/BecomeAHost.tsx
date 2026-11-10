@@ -11,8 +11,9 @@ import { useCurrentUser } from "@/lib/auth/session";
 import { useDemoState } from "@/mocks/store";
 import { applicationChecklist, hoursByDay, isEditable } from "../service";
 import { HoursForm } from "./HoursForm";
-import { ListingForm, type ListingDefaults } from "./ListingForm";
-import { LocationForm, type LocationDefaults } from "./LocationForm";
+import { listingDefaults, locationDefaults } from "./form-defaults";
+import { ListingForm } from "./ListingForm";
+import { LocationForm } from "./LocationForm";
 import { SubmitForm } from "./SubmitForm";
 import styles from "./become-a-host.module.scss";
 
@@ -63,26 +64,8 @@ export function BecomeAHost() {
     );
   }
 
-  const defaults: ListingDefaults = {
-    hostType: listing?.hostType ?? "individual",
-    displayName: listing?.displayName ?? "",
-    businessName: listing?.businessName ?? "",
-    rulesText: listing?.rulesText ?? "",
-    maxParcelSize: listing?.maxParcelSize ?? "medium",
-    maxValueEuros: String((listing?.maxDeclaredValueCents ?? 20000) / 100),
-    capacity: String(listing?.maxConcurrentParcels ?? 5),
-  };
-
-  const { address } = application;
-  const locationDefaults: LocationDefaults = {
-    addressLine1: address?.addressLine1 ?? "",
-    addressLine2: address?.addressLine2 ?? "",
-    postalCode: address?.postalCode ?? "",
-    city: address?.city ?? "Lisboa",
-    areaLabel: listing?.areaLabel ?? "",
-    accessInstructions: address?.accessInstructions ?? "",
-    location: address?.exactLocation ?? null,
-  };
+  const defaults = listingDefaults(listing);
+  const location = locationDefaults(listing, application.address);
 
   return (
     <>
@@ -122,7 +105,7 @@ export function BecomeAHost() {
           <StepHeading id="step-location" number={3} title={t("steps.location")} />
           <p className={styles.intro}>{t("location.intro")}</p>
           {listing ? (
-            <LocationForm defaults={locationDefaults} editable={editable} />
+            <LocationForm defaults={location} editable={editable} />
           ) : (
             <p className={styles.intro}>{t("hours.needListing")}</p>
           )}

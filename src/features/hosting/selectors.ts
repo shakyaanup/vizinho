@@ -1,4 +1,5 @@
 import type { DemoDb, HostProfile, HostStatus } from "@/mocks/types";
+import { addDays, lisbonDate } from "@/lib/time/lisbon";
 
 /** The statuses an admin filters the queue by, in tab order. */
 export const QUEUE_STATUSES = [
@@ -71,3 +72,20 @@ export const STATUS_TONE: Record<HostStatus, HostStatusTone> = {
   rejected: "danger",
   suspended: "danger",
 };
+
+/**
+ * A host's current and future periods away, soonest first, with their first
+ * and last Lisbon calendar day (endsAt is exclusive: the midnight after).
+ */
+export function upcomingTimeOff(db: DemoDb, hostId: string, now: Date = new Date()) {
+  const nowIso = now.toISOString();
+  return db.timeOff
+    .filter((t) => t.hostId === hostId && t.endsAt > nowIso)
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+    .map((t) => ({
+      ...t,
+      firstDay: lisbonDate(t.startsAt),
+      lastDay: addDays(lisbonDate(t.endsAt), -1),
+      current: t.startsAt <= nowIso,
+    }));
+}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isCalendarDate } from "@/lib/time/lisbon";
 import type { HostType, ParcelSize } from "@/mocks/types";
 
 /** Version of the host agreement the applicant accepts on submission. */
@@ -123,3 +124,20 @@ export const reviewSchema = z.object({
   decision: z.enum(REVIEW_DECISIONS, "invalidTransition"),
   note: optionalText(1000),
 });
+
+const calendarDate = z.string().trim().refine(isCalendarDate, "date");
+
+/** A period away, as Lisbon calendar days (first and last day inclusive). */
+export const timeOffSchema = z
+  .object({
+    startDate: calendarDate,
+    endDate: calendarDate,
+    reason: optionalText(100),
+  })
+  .refine((v) => v.endDate >= v.startDate, {
+    path: ["endDate"],
+    message: "endBeforeStart",
+  });
+
+export type TimeOffInput = z.infer<typeof timeOffSchema>;
+export type TimeOffField = keyof z.input<typeof timeOffSchema>;

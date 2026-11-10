@@ -33,10 +33,11 @@ The app is available in English (`/`) and European Portuguese (`/pt`), in light 
 - **Become a host:** a multi-step application (listing, opening hours, location, host agreement) with a live checklist. The location step has an Uber-style map (MapLibre + OpenFreeMap), address search (Photon) and "use my current location", and shows the approximate square customers will see. The application is locked while an admin reviews it.
 - **Host approval rules:** draft → in review → approved / rejected → suspended / reinstated. Each decision is allowed from one state only, rejections need a reason, admins can't approve their own listing, and every decision is written to an audit log and notifies the other side.
 - **Admin review:** a queue of host applications by status, and a review page with the listing, opening hours and review history. The private address and exact map pin are hidden until the admin asks for them, and every view is recorded in the audit log.
+- **Host settings:** approved hosts edit their listing and opening hours, pause new requests (accepted reservations carry on), and plan time off in whole Lisbon days (up to 60 days, no overlaps, never on a day a parcel is due). A host can't move address while holding parcels, and moves are audited. A suspended listing is read-only.
 - **Location privacy:** customers only ever see a host's position snapped to a ~400 m grid; exact addresses stay private.
 - **Bilingual, accessible, mobile-first:** next-intl with typed messages, WCAG 2.2 AA (labelled inputs, visible focus, 44 px touch targets, keyboard-operable menus), designed at 360 px first.
 
-Coming next (see the roadmap): host settings, a map to find hosts nearby, reservations and pickup codes.
+Coming next (see the roadmap): a map to find hosts nearby, reservations and pickup codes.
 
 ## Mock data
 
