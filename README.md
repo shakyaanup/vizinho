@@ -3,6 +3,9 @@
 # Vizinho
 
 [![CI](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml/badge.svg)](https://github.com/shakyaanup/vizinho/actions/workflows/ci.yml)
+[![Deploy](https://github.com/shakyaanup/vizinho/actions/workflows/pages.yml/badge.svg)](https://github.com/shakyaanup/vizinho/actions/workflows/pages.yml)
+
+**Live demo: https://shakyaanup.github.io/vizinho/**
 
 A Portugal-first, peer-to-peer parcel pickup app. Customers have parcels delivered to a verified neighbour or local shop ("host") and collect them later with a one-time pickup code. Hosts earn a small fee per pickup; admins approve hosts and keep an eye on every parcel's chain of custody.
 
@@ -10,11 +13,11 @@ A Portugal-first, peer-to-peer parcel pickup app. Customers have parcels deliver
 
 - Product brief: [`docs/VIZINHO_PROJECT_BRIEF.md`](docs/VIZINHO_PROJECT_BRIEF.md)
 - Roadmap and design: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md)
-- Why frontend-only: [ADR 0003](docs/adr/0003-frontend-only-with-mock-data.md)
+- Why frontend-only: [ADR 0003](docs/adr/0003-frontend-only-with-mock-data.md); how the live demo is hosted: [ADR 0004](docs/adr/0004-static-demo-on-github-pages.md)
 
 ## Try it
 
-Run it locally (below) and press **Try as customer / host / admin** on the home page, or log in with a demo account (password `VizinhoDemo2026`):
+Open the [live demo](https://shakyaanup.github.io/vizinho/) (or run it locally, below) and press **Try as customer / host / admin** on the home page, or log in with a demo account (password `VizinhoDemo2026`):
 
 | Role     | Email                       | What to look at                                                      |
 | -------- | --------------------------- | -------------------------------------------------------------------- |

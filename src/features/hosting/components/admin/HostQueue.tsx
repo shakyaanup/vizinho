@@ -55,7 +55,10 @@ export function HostQueue() {
         <ul className={styles.list}>
           {rows.map(({ host, ownerName, changedAt }) => (
             <li key={host.id}>
-              <Link href={`/admin/hosts/${host.id}`} className={styles.row}>
+              <Link
+                href={{ pathname: "/admin/hosts/review", query: { host: host.id } }}
+                className={styles.row}
+              >
                 <span className={styles.rowMain}>
                   <span className={styles.rowTitle}>{host.displayName}</span>
                   <span className={styles.rowMeta}>

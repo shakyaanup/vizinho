@@ -304,7 +304,7 @@ Location snapping already exists (Phase 1 trigger), and the `public_hosts` view 
 1. **Rules** ✅ (first as Postgres RPCs, now `src/features/hosting/service.ts`): `submitApplication` (draft/rejected → pending_review; checks the area, address and hours exist; records the host agreement; audits; notifies admins) and `reviewHost(adminId, hostId, decision, note)` (approve/reject/suspend/reinstate with fixed source states; a note is required to reject or suspend; approval grants the `host` role and suspension keeps it; admins can't review their own listing; audits; notifies the host). An application is locked while in review. Pausing stays a plain owner setting.
 2. **"Become a host" form** ✅ in the customer area: type and name, rules and limits, opening hours, agreement, with a live checklist. The location section waits for Step 3.
 3. **Location picker** ✅: MapLibre + OpenFreeMap with an Uber-style fixed centre pin, Photon address search (accessible combobox), "use my current location", and a shaded preview of the grid cell customers see. Saving stores the exact point privately and publishes only the snapped pin. Phase 3's discovery map reuses `LocationMap`.
-4. **Admin approval queue** ✅: `/admin/hosts` lists hosts by status (waiting applications oldest first, with counts); `/admin/hosts/[id]` shows the listing, owner, hours and history, reveals the private address and exact map pin only on request (each view audited), and offers only the decisions valid from the current state (a note is required to reject or suspend; admins can't decide on their own listing).
+4. **Admin approval queue** ✅: `/admin/hosts` lists hosts by status (waiting applications oldest first, with counts); `/admin/hosts/review?host=<id>` shows the listing, owner, hours and history, reveals the private address and exact map pin only on request (each view audited), and offers only the decisions valid from the current state (a note is required to reject or suspend; admins can't decide on their own listing).
 5. **Host settings** ✅: `/host/listing` (edit the live listing and location; no move while the host has accepted reservations or parcels in storage; moves are audited with the public points only) and `/host/schedule` (pause new requests, weekly hours, time off). Time off is whole Lisbon days, up to 60 days, starting today to a year ahead, at most 10 upcoming, no overlaps, and not on a day a requested or accepted parcel is due. Pause and time off need an approved listing; a suspended listing is read-only.
 
 > **Done 2026-11-10.** Tests: 133 unit, 34 Playwright.
@@ -323,7 +323,7 @@ Incident workflow (both sides + admin queue), audit trail viewer, manual ledger,
 
 ### Phase 6: Pilot hardening
 
-Accessibility audit (WCAG 2.2 AA, axe in CI), PWA manifest, legal pages, Content-Security-Policy, performance budget, deployment of the demo (e.g. Vercel).
+Accessibility audit (WCAG 2.2 AA, axe in CI), PWA manifest, legal pages, Content-Security-Policy, performance budget. (The live demo is already deployed to GitHub Pages since 2026-11-12, ADR 0004.)
 
 Mapping to the brief's months: Phases 1–3 cover Month 2, and Phases 4–6 cover the start of Month 3, before the closed pilot.
 

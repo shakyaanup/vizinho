@@ -43,6 +43,7 @@ Requires Node 24 (`.node-version`) and pnpm via corepack. Nothing else.
 ```
 pnpm dev                 # Next.js dev server (http://localhost:3000)
 pnpm build               # production build
+pnpm build:pages         # static export for GitHub Pages (out/), see ADR 0004
 pnpm check               # typecheck + eslint + stylelint + prettier check + unit tests (run before every commit)
 pnpm typecheck           # next typegen + tsc (typegen creates global types like LayoutProps)
 pnpm lint | lint:styles  # ESLint | Stylelint (SCSS)
@@ -55,13 +56,15 @@ pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 
 **CI (`.github/workflows/ci.yml`):** `checks` (pnpm check) and `e2e` (build + Playwright) on every push to main and every PR. No services or secrets.
 
+**Live demo (`.github/workflows/pages.yml`, ADR 0004):** after CI passes on main, `pnpm build:pages` publishes a static export to https://shakyaanup.github.io/vizinho/. It must keep building: no page may need per-request data (no server `searchParams`/`cookies`, no dynamic route ids unknown at build time; take ids from `?query` read in the browser), and public files referenced by URL need `process.env.NEXT_PUBLIC_BASE_PATH`.
+
 ## Next.js 16.4 specifics (differs from older versions)
 
 - Read `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
 - **`middleware.ts` is now `src/proxy.ts`** (export `proxy`). Here it only does next-intl locale routing.
 - **`cacheComponents` is on:** request APIs (`cookies`, `headers`, `params`, `searchParams`) are async and must be read inside `<Suspense>`.
 - `next lint` no longer exists. Use `pnpm lint`.
-- Don't read `?query` params with `useSearchParams()` in forms on static pages, because React then skips server-rendering them. Read `searchParams` in the page (inside `<Suspense>`) and pass props down (see the login page).
+- Don't read `?query` params with `useSearchParams()` in forms, because React then skips server-rendering them. Read them in the browser with `useSyncExternalStore` (see `LoginForm`'s `useNextParam`). Pages that are client-rendered anyway (e.g. the admin review page) may use `useSearchParams()` inside `<Suspense>`.
 
 ## Data, session & i18n patterns
 
@@ -86,7 +89,7 @@ pnpm test:e2e            # Playwright: builds, serves on :3100, runs tests/e2e
 
 - `/customer`, `/host`, `/admin` each use `<AppShell area="…">` in their `layout.tsx`. The shell (nav, top bar) is a static server component; the user menu and the page (inside `RoleGate`) are client-side.
 - Page files stay thin server components (metadata via `getTranslations`) that render a client component from `src/features/<domain>/components/`.
-- **Dynamic routes in an area** (e.g. `/admin/hosts/[hostId]`): read `params` inside `<Suspense>`. The shell already wraps its URL-reading parts (`AppNav`, `RoleGate`) in Suspense for this.
+- **Pages that pick a record** use a query parameter, not a dynamic segment (e.g. `/admin/hosts/review?host=<id>`), so the static demo can export them. The shell wraps its URL-reading parts (`AppNav`, `RoleGate`) in Suspense.
 - **Nav items** are defined once in `src/components/layout/AppShell/nav-config.ts` (max 5 per area, for the phone tab bar). Unbuilt sections render `<ComingSoon area section phase />`.
 - **Theme:** `useTheme()` (`src/lib/theme`), stored in localStorage and applied pre-paint by `themeInitScript` in `<head>`. `<html>`/`<body>` have `suppressHydrationWarning` for that script and for browser extensions.
 - Radix `asChild` needs exactly **one** child element. `DropdownMenuRadioItem` forbids `asChild`; for links in menus use `DropdownMenuItem asChild`.

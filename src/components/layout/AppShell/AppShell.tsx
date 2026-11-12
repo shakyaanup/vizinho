@@ -30,8 +30,8 @@ export async function AppShell({ area, children }: AppShellProps) {
         </Link>
         <span className={styles.areaBadge}>{t(`areas.${area}`)}</span>
         <nav aria-label={t("mainNavigation")}>
-          {/* Dynamic pages (e.g. /admin/hosts/[id]) only know their URL per
-              request, so URL-reading parts sit in Suspense. */}
+          {/* Pages that read their URL per request only know it in the
+              browser, so URL-reading parts sit in Suspense. */}
           <Suspense
             fallback={<AppNavLinks area={area} variant="sidebar" pathname={null} />}
           >

@@ -88,7 +88,9 @@ export function LocationMap({
       if (cancelled || !containerRef.current) return;
       const { MapLibreMap: Map, NavigationControl } = maplibre;
       // The tile worker is served from public/ (see scripts/copy-map-worker.mjs).
-      maplibre.setWorkerUrl(`/maplibre/maplibre-gl-worker-${maplibre.getVersion()}.js`);
+      maplibre.setWorkerUrl(
+        `${process.env.NEXT_PUBLIC_BASE_PATH}/maplibre/maplibre-gl-worker-${maplibre.getVersion()}.js`,
+      );
       map = new Map({
         container: containerRef.current,
         style: MAP_STYLES[theme],

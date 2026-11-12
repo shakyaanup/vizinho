@@ -15,17 +15,37 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * GitHub Pages build (scripts/build-pages.mjs): plain static files under the
+ * repository's path, e.g. /vizinho. There is no server there, so no proxy
+ * (language routing) and no response headers; the script lays out the
+ * locales as folders instead.
+ */
+const staticExport = process.env.STATIC_EXPORT === "1";
+const basePath = staticExport ? (process.env.PAGES_BASE_PATH ?? "") : "";
+
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  ...(staticExport && { output: "export", trailingSlash: true }),
+  basePath,
+  env: {
+    // Public files that aren't loaded through Next.js (the map worker) need it.
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
+  // Partial prerendering needs a server; a static export renders every page
+  // in full at build time instead.
+  ...(staticExport && { experimental: { cpus: 2 } }),
+  cacheComponents: !staticExport,
+  partialPrefetching: !staticExport,
   poweredByHeader: false,
   sassOptions: {
     // Lets any .scss file write `@use "styles/tokens" as *;`
     loadPaths: [path.join(process.cwd(), "src")],
   },
-  async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
-  },
+  ...(!staticExport && {
+    async headers() {
+      return [{ source: "/:path*", headers: securityHeaders }];
+    },
+  }),
 };
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");

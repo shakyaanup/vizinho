@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Eye, LockKeyhole } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LocationMap } from "@/components/map/LocationMap";
@@ -41,6 +42,12 @@ const HISTORY_ACTIONS = [
 ] as const;
 const isHistoryAction = (key: string): key is (typeof HISTORY_ACTIONS)[number] =>
   (HISTORY_ACTIONS as readonly string[]).includes(key);
+
+/** Reads ?host=<id> (render inside Suspense). */
+export function HostReviewFromQuery() {
+  const hostId = useSearchParams().get("host") ?? "";
+  return <HostReview key={hostId} hostId={hostId} />;
+}
 
 export function HostReview({ hostId }: { hostId: string }) {
   const t = useTranslations("AdminHosts");

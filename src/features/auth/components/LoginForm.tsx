@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useActionState } from "react";
+import { useActionState, useSyncExternalStore } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
@@ -13,12 +13,24 @@ import { idleState } from "../form-state";
 import { useRedirectOnSuccess } from "../use-redirect-on-success";
 import styles from "./auth-form.module.scss";
 
-type LoginFormProps = {
-  /** Where to go after logging in (validated by safeRedirectPath). */
-  next?: string;
-};
+const noSubscription = () => () => {};
 
-export function LoginForm({ next = "" }: LoginFormProps) {
+/**
+ * ?next= (where to go after logging in), read in the browser. The server
+ * renders the form without it (the page is static, also on GitHub Pages),
+ * and hydration fills it in. Unlike useSearchParams, this doesn't make React
+ * skip server-rendering the form. The action validates it (safeRedirectPath).
+ */
+function useNextParam() {
+  return useSyncExternalStore(
+    noSubscription,
+    () => new URLSearchParams(window.location.search).get("next") ?? "",
+    () => "",
+  );
+}
+
+export function LoginForm() {
+  const next = useNextParam();
   const t = useTranslations("Auth");
   const tCommon = useTranslations("Common");
   const [state, formAction, pending] = useActionState(logIn, idleState);
